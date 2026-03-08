@@ -1,4 +1,4 @@
-package  taskhub.domain
+package  musichub.domain;
 
 public class MusicTrack {
 
@@ -26,8 +26,10 @@ public class MusicTrack {
         if (durationInSeconds <=0)
             throw new IllegalArgumentException("duration in seconds  is required");
 
-        if (audioFile == null || audioFile.length == 0)
-            throw new IllegalArgumentException("Audio file is required");
+
+        // works but not needed for stage 1
+//        if (audioFile == null || audioFile.length == 0)
+//            throw new IllegalArgumentException("Audio file is required");
 
 
         //assign variables
