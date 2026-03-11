@@ -1,5 +1,5 @@
 -- Create database
-CREATE DATABASE IF NOT EXISTS taskhub;
+CREATE DATABASE IF NOT EXISTS musichub;
 USE taskhub;
 
 -- Create table
