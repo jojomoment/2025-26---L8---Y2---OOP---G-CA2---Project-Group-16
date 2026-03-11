@@ -14,8 +14,7 @@ import java.util.Optional;
 
 
 
-public class JdbcMusicTrackDao implements MusicTrackDao
-{
+public class JdbcMusicTrackDao implements MusicTrackDao {
 
     private Connection connection;
 
@@ -24,24 +23,44 @@ public class JdbcMusicTrackDao implements MusicTrackDao
     }
 
 
+    @Override
+    public boolean deleteById(int songId) {
+        String sql = "DELETE FROM music_tracks WHERE songId = ?";
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement statement = c.prepareStatement(sql)) {
 
-//    @Override
-//    public boolean deleteById(int trackId) {
-//        String sqlQuery = "DELETE FROM music_tracks WHERE song_id = ?";
-//        try (PreparedStatement statement = connection.prepareStatement(sqlQuery))
-//        {
-//            statement.setInt(1, trackId);
-//            int rowsDeleted = statement.executeUpdate();
-//            return rowsDeleted > 0;
-//        }
-//        catch (SQLException error)
-//        {
-//            error.printStackTrace();
-//            return false;
-//        }
-//    }
+            statement.setInt(1, songId);
+            int rowsDeleted = statement.executeUpdate();
+            return rowsDeleted > 0;
 
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    @Override
+    public MusicTrack updateTrack(int songId, String newTitle, int newBPM, double newDuration) throws Exception {
+        String sql = "UPDATE music_tracks SET songTitle = ?, BPM = ?, durationInSeconds = ? WHERE songId = ?";
 
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql))
+        {
+
+            ps.setString(1, newTitle);
+            ps.setInt(2, newBPM);
+            ps.setDouble(3, newDuration);
+            ps.setInt(4, songId);
+
+            int rowsUpdated = ps.executeUpdate();
+            if (rowsUpdated > 0)
+            {
+                return new MusicTrack(songId, newTitle, newBPM, newDuration);
+            } else
+            {
+                return null;
+            }
+        }
+    }
 
     @Override
     // inserts new data into the table
