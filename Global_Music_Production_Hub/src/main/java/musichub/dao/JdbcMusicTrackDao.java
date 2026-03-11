@@ -35,12 +35,12 @@ public class JdbcMusicTrackDao implements MusicTrackDao
         return List.of();
     }
 
-    @Override
-    public boolean deleteById(int trackId) {
+ @Override
+    public boolean deleteById(int id) {
         String sqlQuery = "DELETE FROM music_tracks WHERE song_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sqlQuery))
         {
-            statement.setInt(1, trackId);
+            statement.setInt(1, id);
             int rowsDeleted = statement.executeUpdate();
             return rowsDeleted > 0;
         }
