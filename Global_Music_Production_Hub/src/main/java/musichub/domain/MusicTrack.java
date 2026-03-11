@@ -8,7 +8,7 @@ public class MusicTrack {
     private double durationInSeconds;
     private byte[] audioFile; // BLOB field
 
-    public MusicTrack( int songId, String  songTitle, int BPM,  double durationInSeconds, byte[] audioFile)
+    public MusicTrack( int songId, String  songTitle, int BPM,  double durationInSeconds) //, byte[] audioFile) need to add
     {
 
         // error handling
