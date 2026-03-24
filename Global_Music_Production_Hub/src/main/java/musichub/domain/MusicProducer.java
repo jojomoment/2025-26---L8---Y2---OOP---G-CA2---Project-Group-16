@@ -2,29 +2,30 @@ package  musichub.domain;
 
 public class MusicProducer {
 
-    private int songId;
-    private String songTitle;
-    private int BPM;
-    private double durationInSeconds;
-    private byte[] audioFile; // BLOB field
 
-    public MusicProducer( int songId, String  songTitle, int BPM,  double durationInSeconds, byte[] audioFile)
+    private int producer_id;
+    private String stage_name ;
+    private int tracks_uploaded;
+    private double average_rating;
+
+
+    public MusicProducer( int producer_id, String  stage_name, int tracks_uploaded,  double average_rating)
     {
 
         // error handling
 
-        if (songId <=0)
-            throw new IllegalArgumentException("song id  is required");
+        if (producer_id <=0)
+            throw new IllegalArgumentException("producer id   is required");
 
 
-        if (songTitle == null || songTitle.isBlank())
-            throw new IllegalArgumentException("song title is required");
+        if (stage_name == null || stage_name.isBlank())
+            throw new IllegalArgumentException("stage name  is required");
 
-        if (BPM <=0)
-            throw new IllegalArgumentException("BPM is required");
+        if (tracks_uploaded <=0)
+            throw new IllegalArgumentException("uplodaded tracks   required");
 
-        if (durationInSeconds <=0)
-            throw new IllegalArgumentException("duration in seconds  is required");
+        if (average_rating <=0)
+            throw new IllegalArgumentException("average rating  required");
 
 
         // works but not needed for stage 1
@@ -33,40 +34,37 @@ public class MusicProducer {
 
 
         //assign variables
-        this.songId = songId;
-        this.songTitle = songTitle;
-        this.BPM = BPM;
-        this.durationInSeconds = durationInSeconds;
-        this.audioFile = audioFile;
+        this.producer_id = producer_id;
+        this.stage_name = stage_name;
+        this.tracks_uploaded = tracks_uploaded;
+        this.average_rating = average_rating;
+
 
 
     }
 
     //getters
-    public int getSongId()
+    public int getProducer_id()
     {
-        return songId;
+        return producer_id;
     }
 
-    public String getSongTitle()
+    public String getStage_name()
     {
-        return songTitle;
+        return stage_name;
     }
 
-    public int getBPM()
+    public int getTracks_uploaded()
     {
-        return BPM;
+        return tracks_uploaded;
     }
 
-    public double getDurationInSeconds()
+    public double getAverage_rating()
     {
-        return durationInSeconds;
+        return average_rating;
     }
 
-    public byte[] getAudioFile()
-    {
-        return audioFile;
-    }
+
 
     //setters
 
@@ -74,11 +72,10 @@ public class MusicProducer {
 
     @Override
     public String toString() {
-        return "MusicTrack {songId=" + songId
-                + ", songTitle='" + songTitle + "'"
-                + ", BPM=" + BPM
-                + ", durationInSeconds=" + durationInSeconds
-                + ", audioFileLength=" + (audioFile != null ? audioFile.length : 0)
-                + "}";
+        return "Music Producer {producerId =" + producer_id
+                + ", stage name ='" + stage_name + "'"
+                + ", Total uploaded tracks=" + tracks_uploaded
+                + ", average rating =" + average_rating
+                ;
     }
 }
