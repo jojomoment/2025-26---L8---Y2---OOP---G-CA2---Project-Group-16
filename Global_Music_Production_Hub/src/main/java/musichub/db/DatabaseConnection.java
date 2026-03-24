@@ -17,7 +17,7 @@ public class DatabaseConnection {
 //
 
     private static final String USER = "root"; //check this user is setup under Users in PHPMyAdmin
-    private static final String PASSWORD = " ";
+    private static final String PASSWORD = "";
 
     private DatabaseConnection() {
     }
