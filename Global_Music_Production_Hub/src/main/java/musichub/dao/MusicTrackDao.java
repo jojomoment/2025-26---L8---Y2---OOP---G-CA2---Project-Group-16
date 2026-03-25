@@ -5,18 +5,21 @@ import musichub.domain.MusicTrack;
 
 import java.util.List;
 import java.util.Optional;
-
+import java.util.function.Predicate;
 
 
 public interface MusicTrackDao { //defines interface, defines methods
+
+    boolean deleteById(int songId);
+
+    MusicTrack updateTrack(int songId, String newTitle, int newBPM, double newDuration) throws Exception;
 
     int insert(String songTitle, int BPM, double durationInSeconds) throws Exception; // adding new track to database
 
     List<MusicTrack> getAll() throws Exception;
 
     Optional<MusicTrack> getMusicTrackById(int songId) throws Exception;
-    
-    MusicTrack updateTrack(int songId, String newTitle, int newBPM, double newDuration) throws Exception;
 
-    boolean deleteById(int songId);
-    }
+
+    List<MusicTrack> findByFilter(Predicate<MusicTrack> filter) throws Exception;
+}
