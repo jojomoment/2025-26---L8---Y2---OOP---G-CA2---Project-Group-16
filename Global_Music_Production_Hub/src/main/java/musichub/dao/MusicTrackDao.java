@@ -15,5 +15,8 @@ public interface MusicTrackDao { //defines interface, defines methods
     List<MusicTrack> getAll() throws Exception;
 
     Optional<MusicTrack> getMusicTrackById(int songId) throws Exception;
+    
+    MusicTrack updateTrack(int songId, String newTitle, int newBPM, double newDuration) throws Exception;
 
+    boolean deleteById(int songId);
     }

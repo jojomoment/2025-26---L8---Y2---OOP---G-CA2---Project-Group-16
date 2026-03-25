@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 
 
@@ -38,6 +39,7 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
             return false;
         }
     }
+    
     @Override
     public MusicTrack updateTrack(int songId, String newTitle, int newBPM, double newDuration) throws Exception {
         String sql = "UPDATE music_tracks SET songTitle = ?, BPM = ?, durationInSeconds = ? WHERE songId = ?";
@@ -138,6 +140,16 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
             }
         }
     }
+
+    
+    @Override
+public List<MusicTrack> findByFilter(Predicate<MusicTrack> filter) throws Exception {
+    List<MusicTrack> allTracks = getAll(); // fetch everything from the Database
+    return allTracks.stream()
+                    .filter(filter)  // apply the predicate
+                    .toList();       // return the filtered list
+}
+
 
     private static MusicTrack mapRow(ResultSet rs) throws Exception
     {
