@@ -1,81 +1,60 @@
-package  musichub.domain;
+package musichub.domain;
 
 public class MusicProducer {
 
+    private int producerId;
+    private String stageName;
+    private int tracksUploaded;
+    private double averageRating;
 
-    private int producer_id;
-    private String stage_name ;
-    private int tracks_uploaded;
-    private double average_rating;
-
-
-    public MusicProducer( int producer_id, String  stage_name, int tracks_uploaded,  double average_rating)
-    {
+    public MusicProducer(int producerId, String stageName, int tracksUploaded, double averageRating) {
 
         // error handling
 
-        if (producer_id <=0)
-            throw new IllegalArgumentException("producer id   is required");
+        if (producerId <= 0)
+            throw new IllegalArgumentException("producer id is required");
 
+        if (stageName == null || stageName.isBlank())
+            throw new IllegalArgumentException("stage name is required");
 
-        if (stage_name == null || stage_name.isBlank())
-            throw new IllegalArgumentException("stage name  is required");
+        if (tracksUploaded <= 0)
+            throw new IllegalArgumentException("uploaded tracks required");
 
-        if (tracks_uploaded <=0)
-            throw new IllegalArgumentException("uplodaded tracks   required");
+        if (averageRating <= 0)
+            throw new IllegalArgumentException("average rating required");
 
-        if (average_rating <=0)
-            throw new IllegalArgumentException("average rating  required");
-
-
-        // works but not needed for stage 1
-//        if (audioFile == null || audioFile.length == 0)
-//            throw new IllegalArgumentException("Audio file is required");
-
-
-        //assign variables
-        this.producer_id = producer_id;
-        this.stage_name = stage_name;
-        this.tracks_uploaded = tracks_uploaded;
-        this.average_rating = average_rating;
-
-
-
+        // assign variables
+        this.producerId = producerId;
+        this.stageName = stageName;
+        this.tracksUploaded = tracksUploaded;
+        this.averageRating = averageRating;
     }
 
-    //getters
-    public int getProducer_id()
-    {
-        return producer_id;
+    // getters
+    public int getProducerId() {
+        return producerId;
     }
 
-    public String getStage_name()
-    {
-        return stage_name;
+    public String getStageName() {
+        return stageName;
     }
 
-    public int getTracks_uploaded()
-    {
-        return tracks_uploaded;
+    public int getTracksUploaded() {
+        return tracksUploaded;
     }
 
-    public double getAverage_rating()
-    {
-        return average_rating;
+    public double getAverageRating() {
+        return averageRating;
     }
 
-
-
-    //setters
-
-
+    // setters
 
     @Override
     public String toString() {
-        return "Music Producer {producerId =" + producer_id
-                + ", stage name ='" + stage_name + "'"
-                + ", Total uploaded tracks=" + tracks_uploaded
-                + ", average rating =" + average_rating
+        return "Music Producer {producerId =" + producerId
+                + ", stage name ='" + stageName + "'"
+                + ", Total uploaded tracks=" + tracksUploaded
+                + ", average rating =" + averageRating
                 ;
     }
 }
