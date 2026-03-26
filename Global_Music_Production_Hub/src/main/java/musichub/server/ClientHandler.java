@@ -26,10 +26,10 @@ public class ClientHandler implements Runnable
     }
 
     @Override
-    public void run()
-     {
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-             PrintWriter out = new PrintWriter(client.getOutputStream(), true)) {
+    public void run() {
+        try (Socket currentClient = client;
+             BufferedReader in = new BufferedReader(new InputStreamReader(currentClient.getInputStream()));
+             PrintWriter out = new PrintWriter(currentClient.getOutputStream(), true)) {
 
             String request;
 
@@ -87,14 +87,8 @@ public class ClientHandler implements Runnable
                 out.println(responseJson);
             }
 
-        } 
-        catch (Exception e) 
-        {
+        } catch (Exception e) {
             e.printStackTrace();
-        } 
-        finally 
-        {
-            try { client.close(); } catch (Exception ignored) {}
         }
     }
 }
