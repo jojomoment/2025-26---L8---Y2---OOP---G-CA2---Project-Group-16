@@ -22,12 +22,12 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
 
 
     @Override
-    public boolean deleteById(int songId) {
-        String sql = "DELETE FROM music_tracks WHERE songId = ?";
+    public boolean deleteById(int song_id) {
+        String sql = "DELETE FROM music_tracks WHERE song_id = ?";
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement statement = c.prepareStatement(sql)) {
 
-            statement.setInt(1, songId);
+            statement.setInt(1, song_id);
             int rowsDeleted = statement.executeUpdate();
             return rowsDeleted > 0;
 
@@ -150,10 +150,10 @@ public List<MusicTrack> findByFilter(Predicate<MusicTrack> filter) throws Except
 
     private static MusicTrack mapRow(ResultSet rs) throws Exception
     {
-        int id = rs.getInt("songId");
-        String title = rs.getString("songTitle");
+        int id = rs.getInt("song_id");
+        String title = rs.getString("song_title");
         int bpm = rs.getInt("BPM");
-        double duration = rs.getDouble("durationInSeconds");
+        double duration = rs.getDouble("duration_in_seconds");
         return new MusicTrack(id, title, bpm, duration, null);
     }
 }
