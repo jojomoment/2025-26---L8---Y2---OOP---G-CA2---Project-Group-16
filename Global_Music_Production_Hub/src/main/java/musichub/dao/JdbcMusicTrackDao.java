@@ -38,8 +38,8 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     }
     
     @Override
-    public MusicTrack updateTrack(int songId, String newTitle, int newBPM, double newDuration) throws Exception {
-        String sql = "UPDATE music_tracks SET songTitle = ?, BPM = ?, durationInSeconds = ? WHERE songId = ?";
+    public MusicTrack updateTrack(int song_id, String newTitle, int newBPM, double newDuration) throws Exception {
+        String sql = "UPDATE music_tracks SET song_title = ?, BPM = ?, duration_in_seconds = ? WHERE song_id = ?";
 
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql))
@@ -48,12 +48,12 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
             ps.setString(1, newTitle);
             ps.setInt(2, newBPM);
             ps.setDouble(3, newDuration);
-            ps.setInt(4, songId);
+            ps.setInt(4, song_id);
 
             int rowsUpdated = ps.executeUpdate();
             if (rowsUpdated > 0)
             {
-                return new MusicTrack(songId, newTitle, newBPM, newDuration, null);
+                return new MusicTrack(song_id, newTitle, newBPM, newDuration, null);
             } else
             {
                 return null;
@@ -63,14 +63,14 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
 
     @Override
     // inserts new data into the table
-    public int insert(String songTitle, int BPM, double durationInSeconds) throws Exception
+    public int insert(String song_title, int BPM, double duration_in_seconds) throws Exception
     {
         //making sure invalid data isnt entered
-        if (songTitle == null || songTitle.isBlank())
+        if (song_title == null || song_title.isBlank())
             throw new IllegalArgumentException("songTitle is required");
 
         //adding row to music tracks table with specified parameters and placeholders
-        String sql = "INSERT INTO music_tracks(songTitle, BPM, durationInSeconds) VALUES (?, ?, ?)"; // sql query in a java string
+        String sql = "INSERT INTO music_tracks(song_title, BPM, duration_in_seconds) VALUES (?, ?, ?)"; // sql query in a java string
 
 
         // closes when finished
@@ -81,9 +81,9 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
 
             // populate ? placeholders
             // numbers ref positon
-            ps.setString(1, songTitle.trim());
+            ps.setString(1, song_title.trim());
             ps.setInt(2, BPM);
-            ps.setDouble(3, durationInSeconds);
+            ps.setDouble(3, duration_in_seconds);
 
 
             // excutes and checks if a row was affected or not
@@ -105,7 +105,7 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     @Override
     public List<MusicTrack> getAll() throws Exception
     {
-        String sql = "SELECT songId, songTitle, BPM, durationInSeconds FROM music_tracks ORDER BY songId"; //sql query in string java code
+        String sql = "SELECT song_id, song_title, BPM, duration_in_seconds FROM music_tracks ORDER BY song_id"; //sql query in string java code
 
         // closes when code finishes
         try (Connection c = DatabaseConnection.getConnection();
@@ -120,16 +120,16 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     }
 
     @Override
-    public Optional<MusicTrack> getMusicTrackById(int songId) throws Exception {
-        if (songId <= 0)
+    public Optional<MusicTrack> getMusicTrackById(int song_id) throws Exception {
+        if (song_id <= 0)
             return Optional.empty();
 
-        String sql = "SELECT songId, songTitle, BPM, durationInSeconds FROM music_tracks WHERE songId = ?";
+        String sql = "SELECT song_id, song_title, BPM, duration_in_seconds FROM music_tracks WHERE song_id = ?";
 
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
-            ps.setInt(1, songId);
+            ps.setInt(1, song_id);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return Optional.empty();
