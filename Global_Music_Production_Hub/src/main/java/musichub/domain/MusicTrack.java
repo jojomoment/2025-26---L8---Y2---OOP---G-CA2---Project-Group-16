@@ -2,28 +2,28 @@ package  musichub.domain;
 
 public class MusicTrack {
 
-    private int songId;
-    private String songTitle;
+    private int song_id;
+    private String song_title;
     private int BPM;
-    private double durationInSeconds;
-    private byte[] audioFile; // BLOB field
+    private double duration_in_seconds;
+    private byte[] audio_file; // BLOB field
 
-    public MusicTrack( int songId, String  songTitle, int BPM,  double durationInSeconds, byte[] audioFile)
+    public MusicTrack( int song_id, String  song_title, int BPM,  double duration_in_seconds, byte[] audio_file)
     {
 
         // error handling
 
-        if (songId <=0)
+        if (song_id <=0)
             throw new IllegalArgumentException("song id  is required");
 
 
-        if (songTitle == null || songTitle.isBlank())
+        if (song_title == null || song_title.isBlank())
             throw new IllegalArgumentException("song title is required");
 
         if (BPM <=0)
             throw new IllegalArgumentException("BPM is required");
 
-        if (durationInSeconds <=0)
+        if (duration_in_seconds <=0)
             throw new IllegalArgumentException("duration in seconds  is required");
 
 
@@ -33,11 +33,11 @@ public class MusicTrack {
 
 
         //assign variables
-        this.songId = songId;
-        this.songTitle = songTitle;
+        this.song_id = song_id;
+        this.song_title = song_title;
         this.BPM = BPM;
-        this.durationInSeconds = durationInSeconds;
-        this.audioFile = audioFile;
+        this.duration_in_seconds = duration_in_seconds;
+        this.audio_file = audio_file;
 
 
     }
@@ -45,12 +45,12 @@ public class MusicTrack {
     //getters
     public int getSongId()
     {
-        return songId;
+        return song_id;
     }
 
     public String getSongTitle()
     {
-        return songTitle;
+        return song_title;
     }
 
     public int getBPM()
@@ -60,12 +60,12 @@ public class MusicTrack {
 
     public double getDurationInSeconds()
     {
-        return durationInSeconds;
+        return duration_in_seconds;
     }
 
     public byte[] getAudioFile()
     {
-        return audioFile;
+        return audio_file;
     }
 
     //setters
@@ -74,11 +74,11 @@ public class MusicTrack {
 
     @Override
     public String toString() {
-        return "MusicTrack {songId=" + songId
-                + ", songTitle='" + songTitle + "'"
+        return "MusicTrack {songId=" + song_id
+                + ", songTitle='" + song_title + "'"
                 + ", BPM=" + BPM
-                + ", durationInSeconds=" + durationInSeconds
-                + ", audioFileLength=" + (audioFile != null ? audioFile.length : 0)
+                + ", durationInSeconds=" + duration_in_seconds
+                + ", audioFileLength=" + (audio_file != null ? audio_file.length : 0)
                 + "}";
     }
 }
