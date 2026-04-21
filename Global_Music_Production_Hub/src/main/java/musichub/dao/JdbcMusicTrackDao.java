@@ -53,7 +53,7 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
             int rowsUpdated = ps.executeUpdate();
             if (rowsUpdated > 0)
             {
-                return new MusicTrack(songId, newTitle, newBPM, newDuration, null);
+                return new MusicTrack(songId, newTitle, newBPM, newDuration);
             } else
             {
                 return null;
@@ -154,6 +154,6 @@ public List<MusicTrack> findByFilter(Predicate<MusicTrack> filter) throws Except
         String title = rs.getString("songTitle");
         int bpm = rs.getInt("BPM");
         double duration = rs.getDouble("durationInSeconds");
-        return new MusicTrack(id, title, bpm, duration, null);
+        return new MusicTrack(id, title, bpm, duration);
     }
 }

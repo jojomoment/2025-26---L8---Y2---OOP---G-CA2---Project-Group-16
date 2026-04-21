@@ -8,7 +8,7 @@ public class MusicTrack {
     private double durationInSeconds;
     private byte[] audioFile; // BLOB field
 
-    public MusicTrack( int songId, String  songTitle, int BPM,  double durationInSeconds, byte[] audioFile)
+    public MusicTrack( int songId, String  songTitle, int BPM,  double durationInSeconds)
     {
 
         // error handling
@@ -80,5 +80,20 @@ public class MusicTrack {
                 + ", durationInSeconds=" + durationInSeconds
                 + ", audioFileLength=" + (audioFile != null ? audioFile.length : 0)
                 + "}";
+    }
+
+    public void setBPM(int newBPM) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setBPM'");
+    }
+
+    public void setDurationInSeconds(double newDuration) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setDurationInSeconds'");
+    }
+
+    public void setSongTitle(String newTitle) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setSongTitle'");
     }
 }

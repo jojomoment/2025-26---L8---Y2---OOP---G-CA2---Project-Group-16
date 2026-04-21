@@ -1,6 +1,7 @@
 package musichub.server;
 
 import musichub.dao.MusicTrackDao;
+import musichub.dao.FakeMusicTrackDao;
 import musichub.dao.JdbcMusicTrackDao;
 
 import java.io.IOException;
@@ -22,7 +23,8 @@ public class Server {
 
         this.port = port;
         this.dao = dao;
-        this.pool = Executors.newCachedThreadPool();
+// F10 - ExecutorService for multithreaded clients
+this.pool = Executors.newCachedThreadPool();
     }
 
     public void start() throws IOException {
@@ -31,13 +33,14 @@ public class Server {
             while (!Thread.currentThread().isInterrupted()) {
                 Socket client = serverSocket.accept();
                 System.out.println("Client connected: " + client.getInetAddress());
-                pool.submit(new ClientHandler(client, dao));
+// F10 - Each client own thread
+pool.submit(new ClientHandler(client, dao));
             }
         }
     }
 
     public static void main(String[] args) throws Exception {
-        MusicTrackDao dao = new JdbcMusicTrackDao();
+MusicTrackDao dao = new FakeMusicTrackDao();
         new Server(9001, dao).start();
     }
 }
