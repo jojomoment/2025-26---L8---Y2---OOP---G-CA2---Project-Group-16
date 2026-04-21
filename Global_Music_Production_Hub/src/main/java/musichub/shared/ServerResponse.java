@@ -1,5 +1,6 @@
 package musichub.shared;
 
+// F11 - ServerResponse wrapper
 public class ServerResponse<T>
  {
     private boolean success;

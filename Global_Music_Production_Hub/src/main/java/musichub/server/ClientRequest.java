@@ -1,7 +1,8 @@
 package musichub.server;
 import java.util.Map;
 
-public class ClientRequest {
+public class ClientRequest 
+{
     private String requestType;
     private Map<String, Object> payload;
 
@@ -23,7 +24,7 @@ public class ClientRequest {
     }
 
     public Map<String, Object> getPayload()
-     {
+    {
         return payload;
     }
 
@@ -40,9 +41,11 @@ public class ClientRequest {
 
     public int getInt(String key) 
     {
+        
         Object v = payload.get(key);
         if (v == null) return -1;
-        try {
+        try
+         {
             return Integer.parseInt(v.toString());
         } 
         catch (NumberFormatException e) 
