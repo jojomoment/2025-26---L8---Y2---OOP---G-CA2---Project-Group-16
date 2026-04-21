@@ -35,6 +35,7 @@ this.pool = Executors.newCachedThreadPool();
                 System.out.println("Client connected: " + client.getInetAddress());
 // F10 - Each client own thread
 pool.submit(new ClientHandler(client, dao));
+
             }
         }
     }
