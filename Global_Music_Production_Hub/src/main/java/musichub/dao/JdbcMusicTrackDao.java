@@ -23,7 +23,7 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
 
     @Override
     public boolean deleteById(int songId) {
-        String sql = "DELETE FROM music_tracks WHERE songId = ?";
+        String sql = "DELETE FROM music_tracks WHERE song_id = ?";
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement statement = c.prepareStatement(sql)) {
 

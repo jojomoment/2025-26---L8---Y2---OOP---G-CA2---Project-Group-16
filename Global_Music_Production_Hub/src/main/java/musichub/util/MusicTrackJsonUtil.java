@@ -37,7 +37,7 @@ public class MusicTrackJsonUtil
     //Testing Code
     public static void main(String[] args) 
     {
-    MusicTrack track = new MusicTrack(1, "Test Song", 120, 180.0, null);
+    MusicTrack track = new MusicTrack(1, "Test Song", 120, 180.0);
     String json = toJson(track);
     System.out.println("JSON: " + json);
 
