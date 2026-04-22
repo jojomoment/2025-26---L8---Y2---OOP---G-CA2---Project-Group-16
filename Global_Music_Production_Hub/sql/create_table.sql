@@ -7,16 +7,16 @@ USE musichub;
 -- =========================
 CREATE TABLE IF NOT EXISTS music_tracks
 (
-    song_id INT NOT NULL AUTO_INCREMENT,
-    song_title VARCHAR(120) NOT NULL,
+    songId INT NOT NULL AUTO_INCREMENT,
+    songTitle VARCHAR(120) NOT NULL,
     BPM INT NOT NULL,
-    duration_in_seconds DOUBLE NOT NULL,
-    audio_file BLOB,
-    PRIMARY KEY (song_id)
+    durationInSeconds DOUBLE NOT NULL,
+    audioFile BLOB,
+    PRIMARY KEY (songId)
     );
 
 -- Seed data for music_tracks
-INSERT INTO music_tracks (song_title, BPM, duration_in_seconds)
+INSERT INTO music_tracks (songTitle, BPM, durationInSeconds)
 VALUES
     ('Song One', 120, 180.0),
     ('Song Two', 128, 200.5),
