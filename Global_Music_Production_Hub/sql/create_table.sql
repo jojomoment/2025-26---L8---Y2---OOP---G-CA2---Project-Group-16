@@ -49,3 +49,33 @@ VALUES
     ('Galway Beats Studio', 12, 60.0),
     ('Limerick Pro Audio', 6, 35.0),
     ('Waterford Music Hub', 15, 70.0);
+
+
+
+
+
+-- =========================
+-- MUSIC PRODUCERS TABLE
+-- =========================
+CREATE TABLE IF NOT EXISTS music_producers
+(
+    producer_id INT NOT NULL,
+    stage_name VARCHAR(120) NOT NULL,
+    tracks_uploaded INT NOT NULL,
+    average_rating DOUBLE NOT NULL,
+    PRIMARY KEY (producer_id)
+    );
+
+
+INSERT INTO music_producers (producer_id, stage_name, tracks_uploaded, average_rating)
+VALUES
+    (1, 'DJ Nova', 25, 4.5),
+    (2, 'BeatMasterX', 40, 4.8),
+    (3, 'EchoWave', 15, 4.2),
+    (4, 'SynthLord', 60, 4.9),
+    (5, 'BassHunter', 30, 4.3),
+    (6, 'RhythmRider', 22, 4.1),
+    (7, 'SoundCrafter', 18, 4.6),
+    (8, 'PulseMaker', 50, 4.7),
+    (9, 'VibeSmith', 27, 4.4),
+    (10, 'TrackWizard', 35, 4.85);
