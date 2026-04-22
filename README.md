@@ -113,4 +113,4 @@ mysql -u root < ../Global_Music_Production_Hub/sql/create_table.sql
 
 ---
 
-*ChatGPT, 2026. Response to a question about BLOB in Java. OpenAI, 8 March.*
+ChatGPT, 2026. Response to a question about BLOB in Java. OpenAI, 8 March. [online] Available at: <https://chat.openai.com> [Accessed 8 March 2026].
