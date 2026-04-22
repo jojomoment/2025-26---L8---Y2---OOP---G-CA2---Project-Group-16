@@ -13,8 +13,9 @@ public class MusicTrack {
 
         // error handling
 
-        if (songId <=0)
-            throw new IllegalArgumentException("song id  is required");
+        // Allow songId 0 for new tracks (before database insert)
+        if (songId < 0)
+            throw new IllegalArgumentException("song id cannot be negative");
 
 
         if (songTitle == null || songTitle.isBlank())
