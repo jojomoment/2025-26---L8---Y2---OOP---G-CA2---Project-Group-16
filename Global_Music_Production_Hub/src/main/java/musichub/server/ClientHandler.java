@@ -88,7 +88,11 @@ public class ClientHandler implements Runnable
                                 track.getSongId(),
                                 track.getSongTitle(),
                                 track.getBPM(),
-                                track.getDurationInSeconds()
+                                track.getDurationInSeconds(),
+                                track.getAudioFile(),
+                                track.getFileName(),
+                                track.getContentType(),
+                                track.getFileSize()
                         );
                         if (updated != null) {
                             ServerResponse<MusicTrack> resp =
@@ -134,12 +138,20 @@ public class ClientHandler implements Runnable
                         int newId = dao.insert(
                                 temp.getSongTitle(),
                                 temp.getBPM(),
-                                temp.getDurationInSeconds()
+                                temp.getDurationInSeconds(),
+                                temp.getAudioFile(),
+                                temp.getFileName(),
+                                temp.getContentType(),
+                                temp.getFileSize()
                         );
                         MusicTrack newTrack = new MusicTrack(newId,
                                 temp.getSongTitle(),
                                 temp.getBPM(),
-                                temp.getDurationInSeconds());
+                                temp.getDurationInSeconds(),
+                                temp.getAudioFile(),
+                                temp.getFileName(),
+                                temp.getContentType(),
+                                temp.getFileSize());
                         ServerResponse<MusicTrack> resp =
                                 ServerResponse.ok("Track created", newTrack);
                         responseJson = MusicTrackJsonUtil.toJson(resp);
@@ -166,3 +178,4 @@ public class ClientHandler implements Runnable
         }
     }
 }
+
