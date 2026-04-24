@@ -13,10 +13,9 @@ public class FakeMusicTrackDao implements MusicTrackDao {
 
     public FakeMusicTrackDao() {
       
-        tracks.add(new MusicTrack(1, "Track One", 120, 180));
-        tracks.add(new MusicTrack(2, "Track Two", 130, 200));
-        tracks.add(new MusicTrack(3, "Track Three", 110, 150));
-
+        tracks.add(new MusicTrack(1, "Track One", 120, 180, null, "track_one.mp3", "audio/mpeg", 3600000));
+        tracks.add(new MusicTrack(2, "Track Two", 130, 200, null, "track_two.wav", "audio/wav", 4200000));
+        tracks.add(new MusicTrack(3, "Track Three", 110, 150, null, "track_three.mp3", "audio/mpeg", 2800000));
         
 
     }
@@ -34,9 +33,11 @@ public class FakeMusicTrackDao implements MusicTrackDao {
     }
 
     @Override
-    public int insert(String songTitle, int BPM, double durationInSeconds) {
+    public int insert(String songTitle, int BPM, double durationInSeconds,
+                      byte[] audioFile, String fileName, String contentType, int fileSize) {
         int newId = tracks.size() + 1;
-        tracks.add(new MusicTrack(newId, songTitle, BPM, durationInSeconds));
+        tracks.add(new MusicTrack(newId, songTitle, BPM, durationInSeconds,
+                                  audioFile, fileName, contentType, fileSize));
         return newId;
     }
 
@@ -46,12 +47,17 @@ public class FakeMusicTrackDao implements MusicTrackDao {
     }
 
     @Override
-    public MusicTrack updateTrack(int songId, String newTitle, int newBPM, double newDuration) {
+    public MusicTrack updateTrack(int songId, String newTitle, int newBPM, double newDuration,
+                                  byte[] audioFile, String fileName, String contentType, int fileSize) {
         for (MusicTrack t : tracks) {
             if (t.getSongId() == songId) {
                 t.setSongTitle(newTitle);
                 t.setBPM(newBPM);
                 t.setDurationInSeconds(newDuration);
+                t.setAudioFile(audioFile);
+                t.setFileName(fileName);
+                t.setContentType(contentType);
+                t.setFileSize(fileSize);
                 return t;
             }
         }
@@ -63,3 +69,4 @@ public class FakeMusicTrackDao implements MusicTrackDao {
         return tracks.stream().filter(filter).toList();
     }
 }
+

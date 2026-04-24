@@ -7,7 +7,8 @@ import java.util.ArrayList;
 public class JsonConversionTest {
     public static void main(String[] args) {
         
-        MusicTrack track = new MusicTrack(1, "Song A", 120, 180.0, null);
+        MusicTrack track = new MusicTrack(1, "Song A", 120, 180.0,
+                                           null, "song_a.mp3", "audio/mpeg", 3600000);
         String json = MusicTrackJsonUtil.toJson(track);
         MusicTrack trackBack = MusicTrackJsonUtil.fromJson(json, MusicTrack.class);
 
@@ -17,7 +18,8 @@ public class JsonConversionTest {
 
         List<MusicTrack> tracks = new ArrayList<>();
         tracks.add(track);
-        tracks.add(new MusicTrack(2, "Song B", 130, 200.0, null));
+        tracks.add(new MusicTrack(2, "Song B", 130, 200.0,
+                                  null, "song_b.wav", "audio/wav", 4200000));
 
         String listJson = MusicTrackJsonUtil.listToJson(tracks);
         List<MusicTrack> tracksBack = MusicTrackJsonUtil.listFromJson(listJson, MusicTrack.class);
@@ -27,3 +29,4 @@ public class JsonConversionTest {
         System.out.println("Round-trip list: " + tracksBack);
     }
 }
+

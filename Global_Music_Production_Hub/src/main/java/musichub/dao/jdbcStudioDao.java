@@ -37,7 +37,7 @@ public class jdbcStudioDao implements StudioDao
 
 
         //adding row to music tracks table with specified parameters and placeholders
-        String sql = "INSERT INTO studio(studio_id, location_name, room_capacity,hourly_rate) VALUES (?, ?, ?,?)"; // sql query in a java string
+        String sql = "INSERT INTO studios(studio_id, location_name, room_capacity,hourly_rate) VALUES (?, ?, ?,?)"; // sql query in a java string
 
 
         // closes when finished
@@ -76,7 +76,7 @@ public class jdbcStudioDao implements StudioDao
     @Override
     public List<Studio> getAll() throws SQLException
     {
-        String sql = "SELECT studio_id, location_name, room_capacity,hourly_rate FROM studio WHERE studio_id ";//sql query in string java code
+        String sql = "SELECT studio_id, location_name, room_capacity,hourly_rate FROM studios";//sql query in string java code
 
         // closes when code finishes
         try (Connection c = DatabaseConnection.getConnection();

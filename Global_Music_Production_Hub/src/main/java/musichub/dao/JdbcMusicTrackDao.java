@@ -23,7 +23,7 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
 
     @Override
     public boolean deleteById(int songId) {
-        String sql = "DELETE FROM music_tracks WHERE song_id = ?";
+        String sql = "DELETE FROM music_tracks WHERE songId = ?";
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement statement = c.prepareStatement(sql)) {
 
@@ -38,8 +38,10 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     }
     
     @Override
-    public MusicTrack updateTrack(int songId, String newTitle, int newBPM, double newDuration) throws Exception {
-        String sql = "UPDATE music_tracks SET songTitle = ?, BPM = ?, durationInSeconds = ? WHERE songId = ?";
+    public MusicTrack updateTrack(int songId, String newTitle, int newBPM, double newDuration,
+                                  byte[] audioFile, String fileName, String contentType, int fileSize) throws Exception {
+        String sql = "UPDATE music_tracks SET songTitle = ?, BPM = ?, durationInSeconds = ?, " +
+                     "audioFile = ?, file_name = ?, content_type = ?, file_size = ? WHERE songId = ?";
 
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql))
@@ -48,12 +50,17 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
             ps.setString(1, newTitle);
             ps.setInt(2, newBPM);
             ps.setDouble(3, newDuration);
-            ps.setInt(4, songId);
+            ps.setBytes(4, audioFile);
+            ps.setString(5, fileName);
+            ps.setString(6, contentType);
+            ps.setInt(7, fileSize);
+            ps.setInt(8, songId);
 
             int rowsUpdated = ps.executeUpdate();
             if (rowsUpdated > 0)
             {
-                return new MusicTrack(songId, newTitle, newBPM, newDuration);
+                return new MusicTrack(songId, newTitle, newBPM, newDuration,
+                                      audioFile, fileName, contentType, fileSize);
             } else
             {
                 return null;
@@ -63,14 +70,16 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
 
     @Override
     // inserts new data into the table
-    public int insert(String songTitle, int BPM, double durationInSeconds) throws Exception
+    public int insert(String songTitle, int BPM, double durationInSeconds,
+                      byte[] audioFile, String fileName, String contentType, int fileSize) throws Exception
     {
         //making sure invalid data isnt entered
         if (songTitle == null || songTitle.isBlank())
             throw new IllegalArgumentException("songTitle is required");
 
         //adding row to music tracks table with specified parameters and placeholders
-        String sql = "INSERT INTO music_tracks(songTitle, BPM, durationInSeconds) VALUES (?, ?, ?)"; // sql query in a java string
+        String sql = "INSERT INTO music_tracks(songTitle, BPM, durationInSeconds, audioFile, file_name, content_type, file_size) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?)"; // sql query in a java string
 
 
         // closes when finished
@@ -84,6 +93,10 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
             ps.setString(1, songTitle.trim());
             ps.setInt(2, BPM);
             ps.setDouble(3, durationInSeconds);
+            ps.setBytes(4, audioFile);
+            ps.setString(5, fileName);
+            ps.setString(6, contentType);
+            ps.setInt(7, fileSize);
 
 
             // excutes and checks if a row was affected or not
@@ -105,7 +118,8 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     @Override
     public List<MusicTrack> getAll() throws Exception
     {
-        String sql = "SELECT songId, songTitle, BPM, durationInSeconds FROM music_tracks ORDER BY songId"; //sql query in string java code
+        String sql = "SELECT songId, songTitle, BPM, durationInSeconds, audioFile, file_name, content_type, file_size " +
+                     "FROM music_tracks ORDER BY songId"; //sql query in string java code
 
         // closes when code finishes
         try (Connection c = DatabaseConnection.getConnection();
@@ -124,7 +138,8 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
         if (songId <= 0)
             return Optional.empty();
 
-        String sql = "SELECT songId, songTitle, BPM, durationInSeconds FROM music_tracks WHERE songId = ?";
+        String sql = "SELECT songId, songTitle, BPM, durationInSeconds, audioFile, file_name, content_type, file_size " +
+                     "FROM music_tracks WHERE songId = ?";
 
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -154,6 +169,11 @@ public List<MusicTrack> findByFilter(Predicate<MusicTrack> filter) throws Except
         String title = rs.getString("songTitle");
         int bpm = rs.getInt("BPM");
         double duration = rs.getDouble("durationInSeconds");
-        return new MusicTrack(id, title, bpm, duration);
+        byte[] audioFile = rs.getBytes("audioFile");
+        String fileName = rs.getString("file_name");
+        String contentType = rs.getString("content_type");
+        int fileSize = rs.getInt("file_size");
+        return new MusicTrack(id, title, bpm, duration, audioFile, fileName, contentType, fileSize);
     }
 }
+

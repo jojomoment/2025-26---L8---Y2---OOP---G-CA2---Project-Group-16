@@ -7,7 +7,10 @@ public class ServerResponse<T>
     private String message;
     private T data;
 
-    private ServerResponse(boolean success, String message, T data) 
+    // No-arg constructor required by Gson
+    ServerResponse() {}
+
+    private ServerResponse(boolean success, String message, T data)
     {
         this.success = success;
         this.message = message;

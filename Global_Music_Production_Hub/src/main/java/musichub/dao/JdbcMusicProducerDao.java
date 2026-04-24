@@ -71,7 +71,8 @@ public class JdbcMusicProducerDao implements MusicProducerDao
 
     @Override
     public List<MusicProducer> getAll() throws SQLException
-    {  String sql = "SELECT producer_id, stage_name, tracks_uploaded, average_rating FROM music_producers WHERE producer_id ";//sql query in string java code
+    {
+        String sql = "SELECT producer_id, stage_name, tracks_uploaded, average_rating FROM music_producers";//sql query in string java code
 
         // closes when code finishes
         try (Connection c = DatabaseConnection.getConnection();

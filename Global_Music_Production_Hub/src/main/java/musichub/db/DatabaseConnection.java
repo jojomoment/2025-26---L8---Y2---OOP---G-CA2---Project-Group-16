@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public class DatabaseConnection {
 
     private static final String URL =
-            "jdbc:mysql://localhost:3306/musichub";
+            "jdbc:mysql://localhost:3306/musichub?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
 
 //    private static final String URL =
 //            "jdbc:mysql://localhost:3306/taskhub?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";

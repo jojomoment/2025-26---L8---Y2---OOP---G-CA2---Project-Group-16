@@ -5,6 +5,7 @@ USE musichub;
 -- =========================
 -- MUSIC TRACKS TABLE
 -- =========================
+DROP TABLE IF EXISTS music_tracks;
 CREATE TABLE IF NOT EXISTS music_tracks
 (
     songId INT NOT NULL AUTO_INCREMENT,
@@ -35,6 +36,7 @@ VALUES
 -- =========================
 -- STUDIOS TABLE
 -- =========================
+DROP TABLE IF EXISTS studios;
 CREATE TABLE IF NOT EXISTS studios
 (
     studio_id INT NOT NULL AUTO_INCREMENT,
@@ -56,6 +58,7 @@ VALUES
 -- =========================
 -- MUSIC PRODUCERS TABLE
 -- =========================
+DROP TABLE IF EXISTS music_producers;
 CREATE TABLE IF NOT EXISTS music_producers
 (
     producer_id INT NOT NULL,
