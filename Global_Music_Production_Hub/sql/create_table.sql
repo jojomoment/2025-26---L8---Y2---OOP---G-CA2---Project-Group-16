@@ -12,22 +12,25 @@ CREATE TABLE IF NOT EXISTS music_tracks
     BPM INT NOT NULL,
     durationInSeconds DOUBLE NOT NULL,
     audioFile BLOB,
+    file_name VARCHAR(255),
+    content_type VARCHAR(100),
+    file_size INT,
     PRIMARY KEY (songId)
     );
 
 -- Seed data for music_tracks
-INSERT INTO music_tracks (songTitle, BPM, durationInSeconds)
+INSERT INTO music_tracks (songTitle, BPM, durationInSeconds, audioFile, file_name, content_type, file_size)
 VALUES
-    ('Song One', 120, 180.0),
-    ('Song Two', 128, 200.5),
-    ('Song Three', 95, 210.0),
-    ('Song Four', 140, 175.0),
-    ('Song Five', 110, 190.0),
-    ('Song Six', 105, 220.5),
-    ('Song Seven', 130, 205.0),
-    ('Song Eight', 100, 180.0),
-    ('Song Nine', 115, 195.0),
-    ('Song Ten', 125, 215.0);
+    ('Song One', 120, 180.0, NULL, 'song_one.mp3', 'audio/mpeg', 3600000),
+    ('Song Two', 128, 200.5, NULL, 'song_two.wav', 'audio/wav', 4200000),
+    ('Song Three', 95, 210.0, NULL, 'song_three.mp3', 'audio/mpeg', 2800000),
+    ('Song Four', 140, 175.0, NULL, 'song_four.flac', 'audio/flac', 5500000),
+    ('Song Five', 110, 190.0, NULL, 'song_five.mp3', 'audio/mpeg', 3100000),
+    ('Song Six', 105, 220.5, NULL, 'song_six.wav', 'audio/wav', 4600000),
+    ('Song Seven', 130, 205.0, NULL, 'song_seven.mp3', 'audio/mpeg', 3900000),
+    ('Song Eight', 100, 180.0, NULL, 'song_eight.mp3', 'audio/mpeg', 3300000),
+    ('Song Nine', 115, 195.0, NULL, 'song_nine.wav', 'audio/wav', 4100000),
+    ('Song Ten', 125, 215.0, NULL, 'song_ten.mp3', 'audio/mpeg', 3700000);
 
 -- =========================
 -- STUDIOS TABLE
@@ -50,10 +53,6 @@ VALUES
     ('Limerick Pro Audio', 6, 35.0),
     ('Waterford Music Hub', 15, 70.0);
 
-
-
-
-
 -- =========================
 -- MUSIC PRODUCERS TABLE
 -- =========================
@@ -65,7 +64,6 @@ CREATE TABLE IF NOT EXISTS music_producers
     average_rating DOUBLE NOT NULL,
     PRIMARY KEY (producer_id)
     );
-
 
 INSERT INTO music_producers (producer_id, stage_name, tracks_uploaded, average_rating)
 VALUES
@@ -79,3 +77,4 @@ VALUES
     (8, 'PulseMaker', 50, 4.7),
     (9, 'VibeSmith', 27, 4.4),
     (10, 'TrackWizard', 35, 4.85);
+
