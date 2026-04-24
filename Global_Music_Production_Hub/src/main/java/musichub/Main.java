@@ -24,7 +24,8 @@ public class Main
 
     private static void createTaskDemo(MusicTrackDao dao) {
         try {
-            int newId = dao.insert("Write DAO notes example", 120, 180.0);
+            int newId = dao.insert("Write DAO notes example", 120, 180.0,
+                                   null, "dao_notes.mp3", "audio/mpeg", 2400000);
             System.out.println("CREATE");
             System.out.println("Inserted task with id: " + newId);
             System.out.println();
@@ -59,43 +60,46 @@ public class Main
     }
 
     private static void updateMusicTrackDemo(MusicTrackDao dao) {
-//        try {
-//            System.out.println("UPDATE");
-//
-////            boolean updated = dao.updateStatus(1, "DONE");
-////            System.out.println("Updated task 1: " + updated);
-//
-//            Optional<Task> updatedTask = dao.findById(1);
-//            if (updatedTask.isPresent())
-//                System.out.println("After update: " + updatedTask.get());
-//
-//            System.out.println();
-//        }
-//        catch (Exception e) {
-//            System.out.println("UPDATE failed");
-//            e.printStackTrace();
-//        }
+        try {
+            System.out.println("UPDATE");
+
+            MusicTrack updated = dao.updateTrack(1, "Updated Song Title", 130, 190.0,
+                                                 null, "updated.mp3", "audio/mpeg", 2500000);
+            System.out.println("Updated track 1: " + updated);
+
+            Optional<MusicTrack> updatedTrack = dao.getMusicTrackById(1);
+            if (updatedTrack.isPresent())
+                System.out.println("After update: " + updatedTrack.get());
+
+            System.out.println();
+        }
+        catch (Exception e) {
+            System.out.println("UPDATE failed");
+            e.printStackTrace();
+        }
     }
 
     private static void deleteTaskDemo(MusicTrackDao dao) {
-//        try {
-//            System.out.println("DELETE");
-//
-//            int tempId = dao.insert("Temporary task for delete demo", "TODO");
-//            System.out.println("Inserted temporary task with id: " + tempId);
-//
-//            boolean deleted = dao.deleteById(tempId);
-//            System.out.println("Deleted task " + tempId + ": " + deleted);
-//
-//            Optional<Task> deletedTask = dao.findById(tempId);
-//            if (deletedTask.isEmpty())
-//                System.out.println("Confirmed: task no longer exists");
-//
-//            System.out.println();
-//        }
-//        catch (Exception e) {
-//            System.out.println("DELETE failed");
-//            e.printStackTrace();
-//        }
+        try {
+            System.out.println("DELETE");
+
+            int tempId = dao.insert("Temporary task for delete demo", 110, 160.0,
+                                    null, "temp.mp3", "audio/mpeg", 2000000);
+            System.out.println("Inserted temporary task with id: " + tempId);
+
+            boolean deleted = dao.deleteById(tempId);
+            System.out.println("Deleted task " + tempId + ": " + deleted);
+
+            Optional<MusicTrack> deletedTrack = dao.getMusicTrackById(tempId);
+            if (deletedTrack.isEmpty())
+                System.out.println("Confirmed: task no longer exists");
+
+            System.out.println();
+        }
+        catch (Exception e) {
+            System.out.println("DELETE failed");
+            e.printStackTrace();
+        }
     }
 }
+
