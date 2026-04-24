@@ -35,7 +35,8 @@ public class TestClient {
             System.out.println(deleteResponse);
 
             // 3] UPDATE track with ID 2
-          MusicTrack updatedTrack = new MusicTrack(2, "Updated Song", 128, 200.0);
+            MusicTrack updatedTrack = new MusicTrack(2, "Updated Song", 128, 200.0,
+                                                      null, "updated_song.mp3", "audio/mpeg", 4500000);
             String updateJson = MusicTrackJsonUtil.toJson(updatedTrack);
             output.println("UPDATE:" + updateJson);
             String updateResponse = input.readLine();
@@ -49,7 +50,8 @@ public class TestClient {
             System.out.println(getByIdResponse);
 
             // INSERT new track (no id)
-            MusicTrack newTrack = new MusicTrack(0, "New Inserted Track", 110, 160.0);
+            MusicTrack newTrack = new MusicTrack(0, "New Inserted Track", 110, 160.0,
+                                                  null, "new_track.mp3", "audio/mpeg", 3200000);
             String insertJson = MusicTrackJsonUtil.toJson(newTrack);
             output.println("INSERT:" + insertJson);
             String insertResponse = input.readLine();
@@ -64,3 +66,4 @@ public class TestClient {
         }
     }
 }
+
