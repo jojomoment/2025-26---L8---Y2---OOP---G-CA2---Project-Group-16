@@ -6,10 +6,12 @@ public class MusicTrack {
     private String songTitle;
     private int BPM;
     private double durationInSeconds;
-    private transient byte[] audioFile; // BLOB field - excluded from JSON
+
+    private  byte[] audioFile; // BLOB field - excluded from JSON
     private String fileName;
     private String contentType;
     private int fileSize;
+
 
     // No-arg constructor required by Gson
     MusicTrack() {}
