@@ -106,9 +106,11 @@ public class TestClient {
                 e.printStackTrace();
             }
 
-
-
-
+            // F21 — Disconnect / Exit
+            output.println("DISCONNECT");
+            String disconnectResponse = input.readLine();
+            System.out.println("\n🔌 Disconnect Response:");
+            System.out.println(disconnectResponse);
 
             socket.close();
             System.out.println("\nClient finished demo.");
@@ -117,6 +119,7 @@ public class TestClient {
             e.printStackTrace();
         }
     }
+
 
 
 
