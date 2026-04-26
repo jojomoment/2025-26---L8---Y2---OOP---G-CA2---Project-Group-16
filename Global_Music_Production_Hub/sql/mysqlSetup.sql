@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS music_tracks
     songTitle VARCHAR(120) NOT NULL,
     BPM INT NOT NULL,
     durationInSeconds DOUBLE NOT NULL,
+    -- F17 — Binary Schema Extension
     audioFile BLOB,
     file_name VARCHAR(255),
     content_type VARCHAR(100),
@@ -80,4 +81,3 @@ VALUES
     (8, 'PulseMaker', 50, 4.7),
     (9, 'VibeSmith', 27, 4.4),
     (10, 'TrackWizard', 35, 4.85);
-
