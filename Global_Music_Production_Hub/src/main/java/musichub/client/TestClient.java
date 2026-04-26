@@ -8,6 +8,13 @@ import java.io.*;
 import java.net.Socket;
 import java.util.List;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+
 public class TestClient {
 
     public static void main(String[] args) {
@@ -58,6 +65,51 @@ public class TestClient {
             System.out.println("\n➕ Insert Response:");
             System.out.println(insertResponse);
 
+
+            // F18 Binary File Upload
+            try {
+                System.out.println("\n📤 Uploading file (F18)...");
+
+                // 1. Read file from disk
+                Path path = Paths.get("src/test.mp3");
+                byte[] fileBytes = Files.readAllBytes(path);
+
+                // 2. Extract metadata
+                String fileName = path.getFileName().toString();
+                String contentType = Files.probeContentType(path);
+                int fileSize = fileBytes.length;
+
+                // 3. Encode to Base64
+                String base64File = Base64.getEncoder().encodeToString(fileBytes);
+
+                // 4. Build request
+                Map<String, Object> uploadRequest = new HashMap<>();
+                uploadRequest.put("type", "UPLOAD_FILE");
+                uploadRequest.put("songTitle", "Test Upload");
+                uploadRequest.put("bpm", 120);
+                uploadRequest.put("durationInSeconds", 180.0);
+                uploadRequest.put("fileName", fileName);
+                uploadRequest.put("contentType", contentType);
+                uploadRequest.put("fileSize", fileSize);
+                uploadRequest.put("fileData", base64File);
+
+                // 5. Send request
+                String json = MusicTrackJsonUtil.toJson(uploadRequest);
+                output.println("UPLOAD:" + json);
+
+                // 6. Read response
+                String uploadResponse = input.readLine();
+                System.out.println("\n📥 Upload Response:");
+                System.out.println(uploadResponse);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+
+
+
             socket.close();
             System.out.println("\nClient finished demo.");
 
@@ -65,5 +117,14 @@ public class TestClient {
             e.printStackTrace();
         }
     }
+
+
+
+
+
+
+
+
+
 }
 
