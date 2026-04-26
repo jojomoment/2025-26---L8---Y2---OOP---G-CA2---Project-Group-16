@@ -7,6 +7,7 @@ public class MusicTrack {
     private int BPM;
     private double durationInSeconds;
 
+    // F17 — Binary Schema Extension (BLOB + metadata fields)
     private  byte[] audioFile; // BLOB field - excluded from JSON
     private String fileName;
     private String contentType;
@@ -149,4 +150,3 @@ public class MusicTrack {
                 + "}";
     }
 }
-
