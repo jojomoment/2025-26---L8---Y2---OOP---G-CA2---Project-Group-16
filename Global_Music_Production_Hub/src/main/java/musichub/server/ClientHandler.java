@@ -163,9 +163,7 @@ public class ClientHandler implements Runnable
                                 ServerResponse.error("Invalid insert request"));
                     }
                 }
-                // unknown
-
-
+                // F18 Binary File Upload
                 else if (request.startsWith("UPLOAD:")) {
                     try {
                         String json = request.substring(7);
@@ -174,7 +172,7 @@ public class ClientHandler implements Runnable
                         UploadRequest uploadRequest =
                                 MusicTrackJsonUtil.fromJson(json, UploadRequest.class);
 
-                        // 2. THIS IS WHERE YOUR LINE GOES 👇
+                        // 2. Decode Base64
                         byte[] fileBytes =
                                 Base64.getDecoder().decode(uploadRequest.getFileData());
 
@@ -222,8 +220,16 @@ public class ClientHandler implements Runnable
                         );
                     }
                 }
-
-
+                // F21 — Disconnect 
+                else if ("DISCONNECT".equalsIgnoreCase(request)) {
+                    System.out.println("Client disconnecting: " + currentClient.getInetAddress());
+                    responseJson = MusicTrackJsonUtil.toJson(
+                            ServerResponse.ok("Disconnected successfully", null)
+                    );
+                    out.println(responseJson);
+                    break; // exit loop cleanly, thread ends
+                }
+                // unknown
                 else 
                     {
 // F16 - Error handling (no raw exceptions to client)
