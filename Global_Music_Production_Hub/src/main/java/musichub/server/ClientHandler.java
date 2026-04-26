@@ -220,16 +220,11 @@ public class ClientHandler implements Runnable
                         );
                     }
                 }
-                // F21 — Disconnect 
                 else if ("DISCONNECT".equalsIgnoreCase(request)) {
                     System.out.println("Client disconnecting: " + currentClient.getInetAddress());
-                    responseJson = MusicTrackJsonUtil.toJson(
-                            ServerResponse.ok("Disconnected successfully", null)
-                    );
-                    out.println(responseJson);
-                    break; // exit loop cleanly, thread ends
+                    out.println(MusicTrackJsonUtil.toJson(ServerResponse.ok("Disconnected", null)));
+                    break;
                 }
-                // unknown
                 else 
                     {
 // F16 - Error handling (no raw exceptions to client)
@@ -247,4 +242,3 @@ public class ClientHandler implements Runnable
         }
     }
 }
-
