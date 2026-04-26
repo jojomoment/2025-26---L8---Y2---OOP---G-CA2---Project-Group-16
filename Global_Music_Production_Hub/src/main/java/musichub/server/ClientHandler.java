@@ -12,6 +12,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
 
+import musichub.domain.UploadRequest;
+import java.util.Base64;
+
 // F11 - ServerResponse wrapper for all replies
 
 
@@ -161,6 +164,66 @@ public class ClientHandler implements Runnable
                     }
                 }
                 // unknown
+
+
+                else if (request.startsWith("UPLOAD:")) {
+                    try {
+                        String json = request.substring(7);
+
+                        // 1. Convert JSON → UploadRequest DTO
+                        UploadRequest uploadRequest =
+                                MusicTrackJsonUtil.fromJson(json, UploadRequest.class);
+
+                        // 2. THIS IS WHERE YOUR LINE GOES 👇
+                        byte[] fileBytes =
+                                Base64.getDecoder().decode(uploadRequest.getFileData());
+
+                        // 3. Build MusicTrack entity
+                        MusicTrack track = new MusicTrack(
+                                0,
+                                uploadRequest.getSongTitle(),
+                                uploadRequest.getBpm(),
+                                uploadRequest.getDurationInSeconds(),
+                                fileBytes,
+                                uploadRequest.getFileName(),
+                                uploadRequest.getContentType(),
+                                uploadRequest.getFileSize()
+                        );
+
+                        // 4. Save to DB
+                        int newId = dao.insert(
+                                track.getSongTitle(),
+                                track.getBPM(),
+                                track.getDurationInSeconds(),
+                                track.getAudioFile(),
+                                track.getFileName(),
+                                track.getContentType(),
+                                track.getFileSize()
+                        );
+
+                        // 5. Response
+                        track = new MusicTrack(newId,
+                                track.getSongTitle(),
+                                track.getBPM(),
+                                track.getDurationInSeconds(),
+                                track.getAudioFile(),
+                                track.getFileName(),
+                                track.getContentType(),
+                                track.getFileSize()
+                        );
+
+                        responseJson = MusicTrackJsonUtil.toJson(
+                                ServerResponse.ok("File uploaded", track)
+                        );
+
+                    } catch (Exception e) {
+                        responseJson = MusicTrackJsonUtil.toJson(
+                                ServerResponse.error("Upload failed")
+                        );
+                    }
+                }
+
+
                 else 
                     {
 // F16 - Error handling (no raw exceptions to client)
