@@ -38,6 +38,7 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     }
     
     @Override
+    // F17 — Binary Schema Extension (update BLOB + metadata)
     public MusicTrack updateTrack(int songId, String newTitle, int newBPM, double newDuration,
                                   byte[] audioFile, String fileName, String contentType, int fileSize) throws Exception {
         String sql = "UPDATE music_tracks SET songTitle = ?, BPM = ?, durationInSeconds = ?, " +
@@ -50,6 +51,7 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
             ps.setString(1, newTitle);
             ps.setInt(2, newBPM);
             ps.setDouble(3, newDuration);
+            // F17 — Binary Schema Extension
             ps.setBytes(4, audioFile);
             ps.setString(5, fileName);
             ps.setString(6, contentType);
@@ -69,6 +71,7 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     }
 
     @Override
+    // F17 — Binary Schema Extension (insert BLOB + metadata)
     // inserts new data into the table
     public int insert(String songTitle, int BPM, double durationInSeconds,
                       byte[] audioFile, String fileName, String contentType, int fileSize) throws Exception
@@ -93,6 +96,7 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
             ps.setString(1, songTitle.trim());
             ps.setInt(2, BPM);
             ps.setDouble(3, durationInSeconds);
+            // F17 — Binary Schema Extension
             ps.setBytes(4, audioFile);
             ps.setString(5, fileName);
             ps.setString(6, contentType);
@@ -116,6 +120,7 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     }
 
     @Override
+    // F17 — Binary Schema Extension (select BLOB + metadata)
     public List<MusicTrack> getAll() throws Exception
     {
         String sql = "SELECT songId, songTitle, BPM, durationInSeconds, audioFile, file_name, content_type, file_size " +
@@ -134,6 +139,7 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     }
 
     @Override
+    // F17 — Binary Schema Extension (select BLOB + metadata by ID)
     public Optional<MusicTrack> getMusicTrackById(int songId) throws Exception {
         if (songId <= 0)
             return Optional.empty();
@@ -163,12 +169,14 @@ public List<MusicTrack> findByFilter(Predicate<MusicTrack> filter) throws Except
 }
 
 
+    // F17 — Binary Schema Extension (map BLOB + metadata from ResultSet)
     private static MusicTrack mapRow(ResultSet rs) throws Exception
     {
         int id = rs.getInt("songId");
         String title = rs.getString("songTitle");
         int bpm = rs.getInt("BPM");
         double duration = rs.getDouble("durationInSeconds");
+        // F17 — Binary Schema Extension
         byte[] audioFile = rs.getBytes("audioFile");
         String fileName = rs.getString("file_name");
         String contentType = rs.getString("content_type");
@@ -176,4 +184,3 @@ public List<MusicTrack> findByFilter(Predicate<MusicTrack> filter) throws Except
         return new MusicTrack(id, title, bpm, duration, audioFile, fileName, contentType, fileSize);
     }
 }
-
