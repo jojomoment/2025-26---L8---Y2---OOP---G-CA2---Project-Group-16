@@ -32,6 +32,17 @@ public class FakeMusicTrackDao implements MusicTrackDao {
                 .findFirst();
     }
 
+    // F20 — File Metadata Query (no BLOB fetch)
+    @Override
+    public Optional<MusicTrack> getMetadataById(int songId) {
+        return tracks.stream()
+                .filter(t -> t.getSongId() == songId)
+                .map(t -> new MusicTrack(t.getSongId(), t.getSongTitle(), t.getBPM(),
+                        t.getDurationInSeconds(), null, t.getFileName(),
+                        t.getContentType(), t.getFileSize()))
+                .findFirst();
+    }
+
     @Override
     public int insert(String songTitle, int BPM, double durationInSeconds,
                       byte[] audioFile, String fileName, String contentType, int fileSize) {
