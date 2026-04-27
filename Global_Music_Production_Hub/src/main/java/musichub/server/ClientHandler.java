@@ -131,6 +131,25 @@ public class ClientHandler implements Runnable
                                 ServerResponse.error("Invalid get by id request"));
                     }
                 }
+                // F20 — File Metadata Query (no BLOB)
+                else if (request.startsWith("GET_METADATA_BY_ID:")) {
+                    try {
+                        String[] parts = request.split(":");
+                        int id = Integer.parseInt(parts[1]);
+                        Optional<MusicTrack> opt = dao.getMetadataById(id);
+                        if (opt.isPresent()) {
+                            ServerResponse<MusicTrack> resp =
+                                    ServerResponse.ok("Metadata fetched", opt.get());
+                            responseJson = MusicTrackJsonUtil.toJson(resp);
+                        } else {
+                            responseJson = MusicTrackJsonUtil.toJson(
+                                    ServerResponse.error("Track not found"));
+                        }
+                    } catch (Exception e) {
+                        responseJson = MusicTrackJsonUtil.toJson(
+                                ServerResponse.error("Invalid metadata request"));
+                    }
+                }
                 // F13 Add Entity
                 // insert
                 else if (request.startsWith("INSERT:")) 
