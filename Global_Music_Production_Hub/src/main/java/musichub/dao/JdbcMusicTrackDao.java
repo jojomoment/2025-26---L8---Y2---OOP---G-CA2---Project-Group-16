@@ -159,6 +159,36 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
         }
     }
 
+    // F20 — File Metadata Query (no BLOB fetch)
+    @Override
+    public Optional<MusicTrack> getMetadataById(int songId) throws Exception {
+        if (songId <= 0)
+            return Optional.empty();
+
+        // SELECT excludes audioFile BLOB column
+        String sql = "SELECT songId, songTitle, BPM, durationInSeconds, file_name, content_type, file_size " +
+                     "FROM music_tracks WHERE songId = ?";
+
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setInt(1, songId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return Optional.empty();
+                int id = rs.getInt("songId");
+                String title = rs.getString("songTitle");
+                int bpm = rs.getInt("BPM");
+                double duration = rs.getDouble("durationInSeconds");
+                String fileName = rs.getString("file_name");
+                String contentType = rs.getString("content_type");
+                int fileSize = rs.getInt("file_size");
+                // No audioFile fetched — metadata only
+                return Optional.of(new MusicTrack(id, title, bpm, duration, null, fileName, contentType, fileSize));
+            }
+        }
+    }
+
     
     @Override
 public List<MusicTrack> findByFilter(Predicate<MusicTrack> filter) throws Exception {
