@@ -22,7 +22,8 @@ public interface MusicTrackDao { //defines interface, defines methods
 
     Optional<MusicTrack> getMusicTrackById(int songId) throws Exception;
 
+    // F20 — File Metadata Query (no BLOB fetch)
+    Optional<MusicTrack> getMetadataById(int songId) throws Exception;
 
     List<MusicTrack> findByFilter(Predicate<MusicTrack> filter) throws Exception;
 }
-
