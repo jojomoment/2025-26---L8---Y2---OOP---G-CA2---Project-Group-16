@@ -106,6 +106,12 @@ public class TestClient {
                 e.printStackTrace();
             }
 
+            // F20 — File Metadata Query (no BLOB)
+            output.println("GET_METADATA_BY_ID:1");
+            String metadataResponse = input.readLine();
+            System.out.println("\n📄 Metadata Response:");
+            System.out.println(metadataResponse);
+
             // F21 — Disconnect / Exit
             output.println("DISCONNECT");
             String disconnectResponse = input.readLine();
@@ -129,5 +135,5 @@ public class TestClient {
 
 
 
-}
 
+}
