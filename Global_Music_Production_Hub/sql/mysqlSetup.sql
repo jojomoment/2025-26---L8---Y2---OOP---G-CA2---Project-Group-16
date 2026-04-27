@@ -1,7 +1,6 @@
 -- Create database
 CREATE DATABASE IF NOT EXISTS musichub;
 USE musichub;
-
 -- =========================
 -- MUSIC TRACKS TABLE
 -- =========================
