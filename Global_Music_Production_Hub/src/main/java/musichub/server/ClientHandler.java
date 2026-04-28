@@ -150,9 +150,37 @@ public class ClientHandler implements Runnable
                                 ServerResponse.error("Invalid metadata request"));
                     }
                 }
+                // F19 — Binary File Retrieval
+                else if (request.startsWith("GET_FILE_BY_ID:")) {
+                    try {
+                        String[] parts = request.split(":");
+                        int id = Integer.parseInt(parts[1]);
+                        Optional<MusicTrack> opt = dao.getMusicTrackById(id);
+                        if (opt.isPresent()) {
+                            MusicTrack track = opt.get();
+                            // Manually Base64-encode because audioFile is transient
+                            String base64Data = Base64.getEncoder().encodeToString(track.getAudioFile());
+                            java.util.Map<String, Object> payload = new java.util.HashMap<>();
+                            payload.put("songId", track.getSongId());
+                            payload.put("songTitle", track.getSongTitle());
+                            payload.put("fileName", track.getFileName());
+                            payload.put("contentType", track.getContentType());
+                            payload.put("fileSize", track.getFileSize());
+                            payload.put("base64Data", base64Data);
+                            ServerResponse<Object> resp = ServerResponse.ok("File fetched", payload);
+                            responseJson = MusicTrackJsonUtil.toJson(resp);
+                        } else {
+                            responseJson = MusicTrackJsonUtil.toJson(
+                                    ServerResponse.error("Track not found"));
+                        }
+                    } catch (Exception e) {
+                        responseJson = MusicTrackJsonUtil.toJson(
+                                ServerResponse.error("Invalid file retrieval request"));
+                    }
+                }
                 // F13 Add Entity
                 // insert
-                else if (request.startsWith("INSERT:")) 
+                else if (request.startsWith("INSERT:"))
                     {
                     try {
                         String json = request.substring(7);
