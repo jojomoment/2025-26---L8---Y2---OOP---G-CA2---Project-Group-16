@@ -112,6 +112,29 @@ public class TestClient {
             System.out.println("\n📄 Metadata Response:");
             System.out.println(metadataResponse);
 
+            // F19 — Binary File Retrieval
+            try {
+                output.println("GET_FILE_BY_ID:1");
+                String fileResponse = input.readLine();
+                System.out.println("\nFile retrieval response received");
+
+                com.google.gson.JsonObject jsonObj = com.google.gson.JsonParser.parseString(fileResponse).getAsJsonObject();
+                boolean success = jsonObj.get("success").getAsBoolean();
+                if (success) {
+                    com.google.gson.JsonObject data = jsonObj.getAsJsonObject("data");
+                    String fileName = data.get("fileName").getAsString();
+                    String base64Data = data.get("base64Data").getAsString();
+                    byte[] decodedBytes = Base64.getDecoder().decode(base64Data);
+                    java.nio.file.Path outPath = java.nio.file.Paths.get("retrieved_" + fileName);
+                    java.nio.file.Files.write(outPath, decodedBytes);
+                    System.out.println("File saved to: " + outPath.toAbsolutePath());
+                } else {
+                    System.out.println("File retrieval failed: " + jsonObj.get("message").getAsString());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             // F21 — Disconnect / Exit
             output.println("DISCONNECT");
             String disconnectResponse = input.readLine();
