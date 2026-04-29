@@ -75,14 +75,22 @@ public class TestClient {
                 byte[] fileBytes = Files.readAllBytes(path);
 
                 // 2. Extract metadata
+
+                // converts path object to normal text
                 String fileName = path.getFileName().toString();
+
+                // attempts to automatically detect content type
                 String contentType = Files.probeContentType(path);
                 int fileSize = fileBytes.length;
 
                 // 3. Encode to Base64
+
+                // converts binary to base64 readable text
                 String base64File = Base64.getEncoder().encodeToString(fileBytes);
 
                 // 4. Build request
+
+                //creates hash map of object
                 Map<String, Object> uploadRequest = new HashMap<>();
                 uploadRequest.put("type", "UPLOAD_FILE");
                 uploadRequest.put("songTitle", "Test Upload");
@@ -93,11 +101,15 @@ public class TestClient {
                 uploadRequest.put("fileSize", fileSize);
                 uploadRequest.put("fileData", base64File);
 
-                // 5. Send request
+
+                // Send request
+                // converts hashmap to json
                 String json = MusicTrackJsonUtil.toJson(uploadRequest);
                 output.println("UPLOAD:" + json);
 
-                // 6. Read response
+                // Read response
+
+                //reads text then displays it
                 String uploadResponse = input.readLine();
                 System.out.println("\n📥 Upload Response:");
                 System.out.println(uploadResponse);
