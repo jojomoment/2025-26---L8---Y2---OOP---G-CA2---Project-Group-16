@@ -16,4 +16,9 @@ public interface StudioDao
     List<Studio> getAll() throws SQLException;
 
     Optional<Studio> getStudioById(int studio_id) throws SQLException;
+
+    boolean deleteById(int studio_id) throws SQLException;
+
+    Studio updateStudio(int studio_id, String location_name, int room_capacity, double hourly_rate) throws SQLException;
+
 }
