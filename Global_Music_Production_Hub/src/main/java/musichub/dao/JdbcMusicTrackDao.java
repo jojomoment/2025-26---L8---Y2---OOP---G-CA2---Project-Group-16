@@ -3,31 +3,24 @@ package musichub.dao;
 import musichub.domain.MusicTrack;
 import musichub.db.DatabaseConnection;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-
-
-
 
 public class JdbcMusicTrackDao implements MusicTrackDao {
 
     public JdbcMusicTrackDao() {
     }
 
-
     @Override
-    public boolean deleteById(int songId) {
+    public boolean deleteById(int song_id) {
         String sql = "DELETE FROM music_tracks WHERE song_id = ?";
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement statement = c.prepareStatement(sql)) {
 
-            statement.setInt(1, songId);
+            statement.setInt(1, song_id);
             int rowsDeleted = statement.executeUpdate();
             return rowsDeleted > 0;
 
@@ -36,124 +29,115 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
             return false;
         }
     }
-    
+
     @Override
-    public MusicTrack updateTrack(int songId, String newTitle, int newBPM, double newDuration) throws Exception {
-        String sql = "UPDATE music_tracks SET songTitle = ?, BPM = ?, durationInSeconds = ? WHERE songId = ?";
+    public MusicTrack updateTrack(int song_id, String newTitle, int newBPM, double newDuration) throws SQLException {
+
+        String sql = "UPDATE music_tracks SET song_title = ?, bpm = ?, duration_in_seconds = ? WHERE song_id = ?";
 
         try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql))
-        {
+             PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setString(1, newTitle);
             ps.setInt(2, newBPM);
             ps.setDouble(3, newDuration);
-            ps.setInt(4, songId);
+            ps.setInt(4, song_id);
 
             int rowsUpdated = ps.executeUpdate();
-            if (rowsUpdated > 0)
-            {
-                return new MusicTrack(songId, newTitle, newBPM, newDuration);
-            } else
-            {
+
+            if (rowsUpdated > 0) {
+                return getMusicTrackById(song_id).orElse(null);
+            } else {
                 return null;
             }
         }
     }
 
     @Override
-    // inserts new data into the table
-    public int insert(String songTitle, int BPM, double durationInSeconds) throws Exception
-    {
-        //making sure invalid data isnt entered
-        if (songTitle == null || songTitle.isBlank())
-            throw new IllegalArgumentException("songTitle is required");
+    public int insert(String song_title, int bpm, double duration_in_seconds) throws SQLException {
 
-        //adding row to music tracks table with specified parameters and placeholders
-        String sql = "INSERT INTO music_tracks(songTitle, BPM, durationInSeconds) VALUES (?, ?, ?)"; // sql query in a java string
+        if (song_title == null || song_title.isBlank())
+            throw new IllegalArgumentException("song_title is required");
 
+        String sql = "INSERT INTO music_tracks(song_title, bpm, duration_in_seconds) VALUES (?, ?, ?)";
 
-        // closes when finished
         try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) // sanitises inputs
-        {
+            ps.setString(1, song_title.trim());
+            ps.setInt(2, bpm);
+            ps.setDouble(3, duration_in_seconds);
 
-            // populate ? placeholders
-            // numbers ref positon
-            ps.setString(1, songTitle.trim());
-            ps.setInt(2, BPM);
-            ps.setDouble(3, durationInSeconds);
-
-
-            // excutes and checks if a row was affected or not
             int rows = ps.executeUpdate();
             if (rows != 1)
                 throw new IllegalStateException("Insert failed, rows=" + rows);
 
-
-            // retriviing the key from the the row
-            try (ResultSet keys = ps.getGeneratedKeys())
-            {
+            try (ResultSet keys = ps.getGeneratedKeys()) {
                 if (!keys.next())
                     throw new IllegalStateException("No generated key returned");
+
                 return keys.getInt(1);
             }
         }
     }
 
     @Override
-    public List<MusicTrack> getAll() throws Exception
-    {
-        String sql = "SELECT songId, songTitle, BPM, durationInSeconds FROM music_tracks ORDER BY songId"; //sql query in string java code
+    public List<MusicTrack> getAll() throws SQLException {
 
-        // closes when code finishes
+        String sql = "SELECT song_id, song_title, bpm, duration_in_seconds FROM music_tracks";
+
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery())
-        {
+             ResultSet rs = ps.executeQuery()) {
 
             List<MusicTrack> tracks = new ArrayList<>();
-            while (rs.next()) tracks.add(mapRow(rs));
+            while (rs.next()) {
+                tracks.add(mapRow(rs));
+            }
             return tracks;
         }
     }
 
     @Override
-    public Optional<MusicTrack> getMusicTrackById(int songId) throws Exception {
-        if (songId <= 0)
+    public Optional<MusicTrack> getMusicTrackById(int song_id) throws SQLException {
+
+        if (song_id <= 0)
             return Optional.empty();
 
-        String sql = "SELECT songId, songTitle, BPM, durationInSeconds FROM music_tracks WHERE songId = ?";
+        String sql = "SELECT song_id, song_title, bpm, duration_in_seconds FROM music_tracks WHERE song_id = ?";
 
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
-            ps.setInt(1, songId);
+            ps.setInt(1, song_id);
 
             try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next()) return Optional.empty();
+
+                if (!rs.next())
+                    return Optional.empty();
+
                 return Optional.of(mapRow(rs));
             }
         }
     }
 
-    
     @Override
-public List<MusicTrack> findByFilter(Predicate<MusicTrack> filter) throws Exception {
-    List<MusicTrack> allTracks = getAll(); // fetch everything from the Database
-    return allTracks.stream()
-                    .filter(filter)  // apply the predicate
-                    .toList();       // return the filtered list
-}
+    public List<MusicTrack> findByFilter(Predicate<MusicTrack> filter) throws SQLException {
 
+        List<MusicTrack> allTracks = getAll();
 
-    private static MusicTrack mapRow(ResultSet rs) throws Exception
-    {
-        int id = rs.getInt("songId");
-        String title = rs.getString("songTitle");
-        int bpm = rs.getInt("BPM");
-        double duration = rs.getDouble("durationInSeconds");
+        return allTracks.stream()
+                .filter(filter)
+                .toList();
+    }
+
+    private static MusicTrack mapRow(ResultSet rs) throws SQLException {
+
+        int id = rs.getInt("song_id");
+        String title = rs.getString("song_title");
+        int bpm = rs.getInt("bpm");
+        double duration = rs.getDouble("duration_in_seconds");
+
         return new MusicTrack(id, title, bpm, duration);
     }
 }

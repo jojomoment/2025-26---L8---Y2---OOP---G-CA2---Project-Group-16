@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface StudioDao
 {
     // try this out int insert(Studio studio)
-    int insert(int studio_id, String location_name, int  room_capacity, double hourly_rate) throws SQLException; // adding new track to database
+    int insert(String location_name, int room_capacity, double hourly_rate) throws SQLException;
 
     List<Studio> getAll() throws SQLException;
 
