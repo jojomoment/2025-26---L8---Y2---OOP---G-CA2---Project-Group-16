@@ -1,81 +1,144 @@
 package musichub.domain;
 
+/**
+ * Represents a recording studio in the system.
+ * Stores location, capacity, and pricing details.
+ *
+ * @author Your Name
+ */
 public class Studio
-
 {
-    private int studio_id;
-    private String location_name ;
-    private int room_capacity;
-    private double hourly_rate;
+    // === Fields ===
 
+    private int fStudioId;
 
-    public Studio ( int studio_id, String  location_name, int room_capacity,  double hourly_rate)
+    private String fLocationName;
+
+    private int fRoomCapacity;
+
+    private double fHourlyRate;
+
+    // === Constructors ===
+
+    // Creates: Studio entity with validated fields
+    public Studio(
+            int studioId,
+            String locationName,
+            int roomCapacity,
+            double hourlyRate)
     {
-
-        // error handling
-
-        if (studio_id <=0)
-            throw new IllegalArgumentException("studio id required");
-
-
-        if (location_name == null || location_name.isBlank())
-            throw new IllegalArgumentException("location name required");
-
-        if (room_capacity <=0)
-            throw new IllegalArgumentException("room capacity required");
-
-        if (hourly_rate <=0)
-            throw new IllegalArgumentException("hourly rate required");
-
-
-        // works but not needed for stage 1
-//        if (audioFile == null || audioFile.length == 0)
-//            throw new IllegalArgumentException("Audio file is required");
-
-
-        //assign variables
-        this.studio_id = studio_id;
-        this.location_name = location_name;
-        this.room_capacity = room_capacity;
-        this.hourly_rate = hourly_rate;
-
-
-
+        setStudioId(studioId);
+        setLocationName(locationName);
+        setRoomCapacity(roomCapacity);
+        setHourlyRate(hourlyRate);
     }
 
-    //getters
-    public int getStudio_id()
+    // === Public API ===
+
+    // Gets: studio ID
+    public int getStudioId()
     {
-        return studio_id;
+        return fStudioId;
     }
 
-    public String getLocation_name()
+    // Gets: location name
+    public String getLocationName()
     {
-        return location_name;
+        return fLocationName;
     }
 
-    public int getRoom_capacity()
+    // Gets: room capacity
+    public int getRoomCapacity()
     {
-        return room_capacity;
+        return fRoomCapacity;
     }
 
-    public double getHourly_rate()
+    // Gets: hourly rate
+    public double getHourlyRate()
     {
-        return hourly_rate;
+        return fHourlyRate;
     }
 
+    // Sets: studio ID
+    public void setStudioId(int studioId)
+    {
+        if (studioId < 0)
+        {
+            throw new IllegalArgumentException(
+                    "Studio ID cannot be negative");
+        }
 
+        this.fStudioId = studioId;
+    }
 
-    //setters
+    // Sets: location name
+    public void setLocationName(String locationName)
+    {
+        if (locationName == null || locationName.isBlank())
+        {
+            throw new IllegalArgumentException(
+                    "Location name is required");
+        }
 
+        this.fLocationName = locationName.trim();
+    }
 
+    // Sets: room capacity
+    public void setRoomCapacity(int roomCapacity)
+    {
+        if (roomCapacity < 1)
+        {
+            throw new IllegalArgumentException(
+                    "Room capacity must be at least 1");
+        }
+
+        this.fRoomCapacity = roomCapacity;
+    }
+
+    // Sets: hourly rate
+    public void setHourlyRate(double hourlyRate)
+    {
+        if (hourlyRate < 0)
+        {
+            throw new IllegalArgumentException(
+                    "Hourly rate cannot be negative");
+        }
+
+        this.fHourlyRate = hourlyRate;
+    }
+
+    // === Overrides ===
 
     @Override
-    public String toString() {
-        return "Music Studio  {studio id =" + studio_id
-                + ", location  name ='" + location_name + "'"
-                + ", room capactiy =" + room_capacity
-                + ", hourly rate  =" + hourly_rate
-                ;
+    public String toString()
+    {
+        return "Studio{" +
+                "studioId=" + fStudioId +
+                ", locationName='" + fLocationName + '\'' +
+                ", roomCapacity=" + fRoomCapacity +
+                ", hourlyRate=" + fHourlyRate +
+                '}';
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return fStudioId;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+
+        if (!(obj instanceof Studio other))
+        {
+            return false;
+        }
+
+        return fStudioId == other.fStudioId;
     }
 }
