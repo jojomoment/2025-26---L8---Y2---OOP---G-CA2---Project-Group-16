@@ -1,30 +1,39 @@
 package  musichub.domain;
 
+
+/**
+ * Represents a music producer in the system.
+ * Stores producer identity, uploaded tracks, and rating.
+ *
+ *
+ */
+
 public class MusicProducer {
 
+//fields
+    private int fProducerId;
+    private String fStageName;
+    private int fTracksUploaded;
+    private double fAverageRating;
 
-    private int producer_id;
-    private String stage_name ;
-    private int tracks_uploaded;
-    private double average_rating;
 
-
-    public MusicProducer( int producer_id, String  stage_name, int tracks_uploaded,  double average_rating)
+    //constructor
+    public MusicProducer(int fProducerId, String  fStageName, int fTracksUploaded, double fAverageRating)
     {
 
         // error handling
 
-        if (producer_id <=0)
+        if (fProducerId < 0)
             throw new IllegalArgumentException("producer id   is required");
 
 
-        if (stage_name == null || stage_name.isBlank())
+        if (fStageName == null || fStageName.isBlank())
             throw new IllegalArgumentException("stage name  is required");
 
-        if (tracks_uploaded <=0)
+        if (fTracksUploaded <=0)
             throw new IllegalArgumentException("uplodaded tracks   required");
 
-        if (average_rating <=0)
+        if (fAverageRating < 0.0 || fAverageRating > 5.0)
             throw new IllegalArgumentException("average rating  required");
 
 
@@ -34,48 +43,97 @@ public class MusicProducer {
 
 
         //assign variables
-        this.producer_id = producer_id;
-        this.stage_name = stage_name;
-        this.tracks_uploaded = tracks_uploaded;
-        this.average_rating = average_rating;
+        this.fProducerId = fProducerId;
+        this.fStageName = fStageName;
+        this.fTracksUploaded = fTracksUploaded;
+        this.fAverageRating = fAverageRating;
 
 
 
+    }
+
+    public MusicProducer()
+    {
+        this.fProducerId = 0;
+        this.fStageName = "";
+        this.fTracksUploaded = 0;
+        this.fAverageRating = 0.0;
     }
 
     //getters
-    public int getProducer_id()
+    public int getfProducerId()
     {
-        return producer_id;
+        return fProducerId;
     }
 
-    public String getStage_name()
+    public String getfStageName()
     {
-        return stage_name;
+        return fStageName;
     }
 
-    public int getTracks_uploaded()
+    public int getfTracksUploaded()
     {
-        return tracks_uploaded;
+        return fTracksUploaded;
     }
 
-    public double getAverage_rating()
+    public double getfAverageRating()
     {
-        return average_rating;
+        return fAverageRating;
     }
 
 
 
     //setters
+    public void setfStageName(String fStageName)
+    {
+        if (fStageName == null || fStageName.isBlank())
+            throw new IllegalArgumentException("stage name required");
 
+        this.fStageName = fStageName.trim();
+    }
 
+    public void setfTracksUploaded(int fTracksUploaded)
+    {
+        if (fTracksUploaded < 0)
+            throw new IllegalArgumentException("tracks uploaded required");
+
+        this.fTracksUploaded = fTracksUploaded;
+    }
+
+    public void setfAverageRating(double fAverageRating)
+    {
+        if (fAverageRating < 0.0 || fAverageRating > 5.0)
+            throw new IllegalArgumentException("invalid rating");
+
+        this.fAverageRating = fAverageRating;
+    }
 
     @Override
-    public String toString() {
-        return "Music Producer {producerId =" + producer_id
-                + ", stage name ='" + stage_name + "'"
-                + ", Total uploaded tracks=" + tracks_uploaded
-                + ", average rating =" + average_rating
+    public String toString()
+    {
+        return "Music Producer {producerId =" + fProducerId
+                + ", stage name ='" + fStageName + "'"
+                + ", Total uploaded tracks=" + fTracksUploaded
+                + ", average rating =" + fAverageRating
                 ;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return fProducerId;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+
+        if (!(obj instanceof MusicProducer))
+            return false;
+
+        MusicProducer other = (MusicProducer) obj;
+        return this.fProducerId == other.fProducerId;
     }
 }
