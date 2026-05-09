@@ -10,42 +10,34 @@ class MusicProducerTest {
     void constructor_initializesAllFields() {
         MusicProducer producer = new MusicProducer(1, "DJ Nova", 25, 4.5);
         
-        assertEquals(1, producer.getProducerId());
-        assertEquals("DJ Nova", producer.getStageName());
-        assertEquals(25, producer.getTracksUploaded());
-        assertEquals(4.5, producer.getAverageRating());
+        assertEquals(1, producer.getfProducerId());
+        assertEquals("DJ Nova", producer.getfStageName());
+        assertEquals(25, producer.getfTracksUploaded());
+        assertEquals(4.5, producer.getfAverageRating());
     }
 
     @Test
-    void setProducerId_updatesField() {
+    void setfStageName_updatesField() {
         MusicProducer producer = new MusicProducer(1, "DJ Nova", 25, 4.5);
         
-        producer.setProducerId(5);
-        assertEquals(5, producer.getProducerId());
+        producer.setfStageName("BeatMaster");
+        assertEquals("BeatMaster", producer.getfStageName());
     }
 
     @Test
-    void setStageName_updatesField() {
+    void setfTracksUploaded_updatesField() {
         MusicProducer producer = new MusicProducer(1, "DJ Nova", 25, 4.5);
         
-        producer.setStageName("BeatMaster");
-        assertEquals("BeatMaster", producer.getStageName());
+        producer.setfTracksUploaded(50);
+        assertEquals(50, producer.getfTracksUploaded());
     }
 
     @Test
-    void setTracksUploaded_updatesField() {
+    void setfAverageRating_updatesField() {
         MusicProducer producer = new MusicProducer(1, "DJ Nova", 25, 4.5);
         
-        producer.setTracksUploaded(50);
-        assertEquals(50, producer.getTracksUploaded());
-    }
-
-    @Test
-    void setAverageRating_updatesField() {
-        MusicProducer producer = new MusicProducer(1, "DJ Nova", 25, 4.5);
-        
-        producer.setAverageRating(4.8);
-        assertEquals(4.8, producer.getAverageRating());
+        producer.setfAverageRating(4.8);
+        assertEquals(4.8, producer.getfAverageRating());
     }
 
     @Test

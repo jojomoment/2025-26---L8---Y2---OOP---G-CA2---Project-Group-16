@@ -34,16 +34,16 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     }
 
     @Override
-    public MusicTrack updateTrack(int song_id, String newTitle, int newBPM, double newDuration) throws SQLException {
+    public MusicTrack updateMusicTrack(int song_id, MusicTrack entity) throws SQLException {
 
         String sql = "UPDATE music_tracks SET songTitle = ?, BPM = ?, durationInSeconds = ? WHERE songId = ?";
 
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
-            ps.setString(1, newTitle);
-            ps.setInt(2, newBPM);
-            ps.setDouble(3, newDuration);
+            ps.setString(1, entity.getSongTitle());
+            ps.setInt(2, entity.getBpm());
+            ps.setDouble(3, entity.getDurationInSeconds());
             ps.setInt(4, song_id);
 
             int rowsUpdated = ps.executeUpdate();
@@ -57,9 +57,9 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     }
 
     @Override
-    public int insert(String song_title, int bpm, double duration_in_seconds) throws SQLException {
+    public MusicTrack insert(MusicTrack track) throws SQLException {
 
-        if (song_title == null || song_title.isBlank())
+        if (track.getSongTitle() == null || track.getSongTitle().isBlank())
             throw new IllegalArgumentException("song_title is required");
 
         String sql = "INSERT INTO music_tracks(songTitle, BPM, durationInSeconds) VALUES (?, ?, ?)";
@@ -67,9 +67,9 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setString(1, song_title.trim());
-            ps.setInt(2, bpm);
-            ps.setDouble(3, duration_in_seconds);
+            ps.setString(1, track.getSongTitle().trim());
+            ps.setInt(2, track.getBpm());
+            ps.setDouble(3, track.getDurationInSeconds());
 
             int rows = ps.executeUpdate();
             if (rows != 1)
@@ -79,7 +79,9 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
                 if (!keys.next())
                     throw new IllegalStateException("No generated key returned");
 
-                return keys.getInt(1);
+                int generatedId = keys.getInt(1);
+                track.setSongId(generatedId);
+                return track;
             }
         }
     }
@@ -207,15 +209,19 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     }
 
     @Override
-    public int insertBinary(String songTitle, int bpm, double durationInSeconds, byte[] audioFile, String fileName, String contentType, int fileSize) throws SQLException {
-        if (songTitle == null || songTitle.isBlank())
+    public MusicTrack insertBinary(MusicTrack track) throws SQLException {
+        if (track.getSongTitle() == null || track.getSongTitle().isBlank())
             throw new IllegalArgumentException("song_title is required");
 
         try {
-            return insertBinaryWithColumns(songTitle, bpm, durationInSeconds, audioFile, fileName, contentType, fileSize, NEW_BINARY_COLUMNS);
+            int id = insertBinaryWithColumns(track.getSongTitle(), track.getBpm(), track.getDurationInSeconds(), track.getAudioFile(), track.getFileName(), track.getContentType(), track.getFileSize(), NEW_BINARY_COLUMNS);
+            track.setSongId(id);
+            return track;
         } catch (SQLException e) {
             if (isUnknownColumnError(e)) {
-                return insertBinaryWithColumns(songTitle, bpm, durationInSeconds, audioFile, fileName, contentType, fileSize, LEGACY_BINARY_COLUMNS);
+                int id = insertBinaryWithColumns(track.getSongTitle(), track.getBpm(), track.getDurationInSeconds(), track.getAudioFile(), track.getFileName(), track.getContentType(), track.getFileSize(), LEGACY_BINARY_COLUMNS);
+                track.setSongId(id);
+                return track;
             }
             throw e;
         }

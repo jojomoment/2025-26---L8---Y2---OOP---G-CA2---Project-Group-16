@@ -34,10 +34,11 @@ public class FakeMusicTrackDao implements MusicTrackDao {
     }
 
     @Override
-    public int insert(String songTitle, int BPM, double durationInSeconds) {
+    public MusicTrack insert(MusicTrack track) {
         int newId = tracks.size() + 1;
-        tracks.add(new MusicTrack(newId, songTitle, BPM, durationInSeconds));
-        return newId;
+        track.setSongId(newId);
+        tracks.add(track);
+        return track;
     }
 
     @Override
@@ -46,12 +47,12 @@ public class FakeMusicTrackDao implements MusicTrackDao {
     }
 
     @Override
-    public MusicTrack updateTrack(int songId, String newTitle, int newBPM, double newDuration) {
+    public MusicTrack updateMusicTrack(int songId, MusicTrack entity) {
         for (MusicTrack t : tracks) {
             if (t.getSongId() == songId) {
-                t.setSongTitle(newTitle);
-                t.setBpm(newBPM);
-                t.setDurationInSeconds(newDuration);
+                t.setSongTitle(entity.getSongTitle());
+                t.setBpm(entity.getBpm());
+                t.setDurationInSeconds(entity.getDurationInSeconds());
                 return t;
             }
         }
@@ -64,11 +65,11 @@ public class FakeMusicTrackDao implements MusicTrackDao {
     }
 
     @Override
-    public int insertBinary(String songTitle, int BPM, double durationInSeconds, byte[] audioFile, String fileName, String contentType, int fileSize) throws Exception {
+    public MusicTrack insertBinary(MusicTrack track) throws Exception {
         int newId = tracks.size() + 1;
-        MusicTrack track = new MusicTrack(newId, songTitle, BPM, durationInSeconds, audioFile, fileName, contentType, fileSize);
+        track.setSongId(newId);
         tracks.add(track);
-        return newId;
+        return track;
     }
 
     @Override

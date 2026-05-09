@@ -24,7 +24,9 @@ public class Main
 
     private static void createTaskDemo(MusicTrackDao dao) {
         try {
-            int newId = dao.insert("Write DAO notes example", 120, 180.0);
+            MusicTrack track = new MusicTrack(0, "Write DAO notes example", 120, 180.0);
+            MusicTrack inserted = dao.insert(track);
+            int newId = inserted.getSongId();
             System.out.println("CREATE");
             System.out.println("Inserted task with id: " + newId);
             System.out.println();

@@ -59,7 +59,9 @@ class Stage3CoreTest {
 
     @Test
     void insert_returnsGeneratedId_andRecordExists() throws Exception {
-        int id = dao.insert("Stage3-Insert-Title", 110, 123.0);
+        MusicTrack track = new MusicTrack(0, "Stage3-Insert-Title", 110, 123.0);
+        MusicTrack inserted = dao.insert(track);
+        int id = inserted.getSongId();
         createdId = id;
 
         assertTrue(id > 0);
@@ -71,9 +73,12 @@ class Stage3CoreTest {
 
     @Test
     void updateTrack_updatesRow_andGetByIdReflectsChanges() throws Exception {
-        createdId = dao.insert("Stage3-Update-Title", 120, 100.0);
+        MusicTrack track = new MusicTrack(0, "Stage3-Update-Title", 120, 100.0);
+        MusicTrack inserted = dao.insert(track);
+        createdId = inserted.getSongId();
 
-        MusicTrack updated = dao.updateTrack(createdId, "Stage3-Update-Title-2", 130, 101.5);
+        MusicTrack updateEntity = new MusicTrack(createdId, "Stage3-Update-Title-2", 130, 101.5);
+        MusicTrack updated = dao.updateMusicTrack(createdId, updateEntity);
         assertNotNull(updated);
         assertEquals(createdId, updated.getSongId());
         assertEquals("Stage3-Update-Title-2", updated.getSongTitle());
@@ -184,26 +189,21 @@ class Stage3CoreTest {
     void binaryInsert_andRetrieveById_bytesMatch() throws Exception {
         byte[] bytes = new byte[]{10, 20, 30, 40, 50};
 
-        int id = dao.insertBinary(
-                "Stage3-Binary-Title",
-                99,
-                12.34,
-                bytes,
-                "song.wav",
-                "audio/wav",
-                bytes.length);
+        MusicTrack track = new MusicTrack(0, "Stage3-Binary-Title", 99, 12.34, bytes, "song.wav", "audio/wav", bytes.length);
+        MusicTrack inserted = dao.insertBinary(track);
+        int id = inserted.getSongId();
 
         createdId = id;
 
         Optional<MusicTrack> retrieved = dao.getMusicTrackWithBinaryById(id);
         assertTrue(retrieved.isPresent());
 
-        MusicTrack track = retrieved.get();
-        assertNotNull(track.getAudioFile());
-        assertArrayEquals(bytes, track.getAudioFile());
-        assertEquals("song.wav", track.getFileName());
-        assertEquals("audio/wav", track.getContentType());
-        assertEquals(bytes.length, track.getFileSize());
+        MusicTrack retrievedTrack = retrieved.get();
+        assertNotNull(retrievedTrack.getAudioFile());
+        assertArrayEquals(bytes, retrievedTrack.getAudioFile());
+        assertEquals("song.wav", retrievedTrack.getFileName());
+        assertEquals("audio/wav", retrievedTrack.getContentType());
+        assertEquals(bytes.length, retrievedTrack.getFileSize());
 
         // metadata-only should not require fetching BLOB, and should still have metadata
         Optional<MusicTrack> metaOnly = dao.getMusicTrackMetadataById(id);
@@ -217,22 +217,17 @@ class Stage3CoreTest {
     @Test
     void getMusicTrackMetadataById_returnsMetadataOnly_withoutBlob() throws Exception {
         byte[] bytes = new byte[]{10, 20, 30};
-        int id = dao.insertBinary(
-                "Stage3-Meta-Only",
-                100,
-                99.9,
-                bytes,
-                "meta.wav",
-                "audio/wav",
-                bytes.length);
+        MusicTrack track = new MusicTrack(0, "Stage3-Meta-Only", 100, 99.9, bytes, "meta.wav", "audio/wav", bytes.length);
+        MusicTrack inserted = dao.insertBinary(track);
+        int id = inserted.getSongId();
         createdId = id;
 
         Optional<MusicTrack> metadataOnly = dao.getMusicTrackMetadataById(id);
         assertTrue(metadataOnly.isPresent());
-        MusicTrack track = metadataOnly.get();
-        assertNull(track.getAudioFile(), "Metadata-only query must not retrieve BLOB bytes");
-        assertEquals("meta.wav", track.getFileName());
-        assertEquals("audio/wav", track.getContentType());
+        MusicTrack metaTrack = metadataOnly.get();
+        assertNull(metaTrack.getAudioFile(), "Metadata-only query must not retrieve BLOB bytes");
+        assertEquals("meta.wav", metaTrack.getFileName());
+        assertEquals("audio/wav", metaTrack.getContentType());
         assertEquals(bytes.length, track.getFileSize());
     }
 }

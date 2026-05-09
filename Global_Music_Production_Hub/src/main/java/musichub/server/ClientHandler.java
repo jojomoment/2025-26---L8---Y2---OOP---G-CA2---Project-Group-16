@@ -84,12 +84,7 @@ public class ClientHandler implements Runnable
                         String json = request.substring(7);
                         MusicTrack track =
                                 MusicTrackJsonUtil.fromJson(json, MusicTrack.class);
-                        MusicTrack updated = dao.updateTrack(
-                                track.getSongId(),
-                                track.getSongTitle(),
-                                track.getBpm(),
-                                track.getDurationInSeconds()
-                        );
+                        MusicTrack updated = dao.updateMusicTrack(track.getSongId(), track);
                         if (updated != null) {
                             ServerResponse<MusicTrack> resp =
                                     ServerResponse.ok("Track updated", updated);
@@ -131,17 +126,9 @@ public class ClientHandler implements Runnable
                     try {
                         String json = request.substring(7);
                         MusicTrack temp = MusicTrackJsonUtil.fromJson(json, MusicTrack.class);
-                        int newId = dao.insert(
-                                temp.getSongTitle(),
-                                temp.getBpm(),
-                                temp.getDurationInSeconds()
-                        );
-                        MusicTrack newTrack = new MusicTrack(newId,
-                                temp.getSongTitle(),
-                                temp.getBpm(),
-                                temp.getDurationInSeconds());
+                        MusicTrack inserted = dao.insert(temp);
                         ServerResponse<MusicTrack> resp =
-                                ServerResponse.ok("Track created", newTrack);
+                                ServerResponse.ok("Track created", inserted);
                         responseJson = MusicTrackJsonUtil.toJson(resp);
                     } catch (Exception e) {
                         responseJson = MusicTrackJsonUtil.toJson(
@@ -154,25 +141,9 @@ public class ClientHandler implements Runnable
                     try {
                         String json = request.substring(14);
                         MusicTrack temp = MusicTrackJsonUtil.fromJson(json, MusicTrack.class);
-                        int newId = dao.insertBinary(
-                                temp.getSongTitle(),
-                                temp.getBpm(),
-                                temp.getDurationInSeconds(),
-                                temp.getAudioFile(),
-                                temp.getFileName(),
-                                temp.getContentType(),
-                                temp.getFileSize()
-                        );
-                        MusicTrack newTrack = new MusicTrack(newId,
-                                temp.getSongTitle(),
-                                temp.getBpm(),
-                                temp.getDurationInSeconds(),
-                                temp.getAudioFile(),
-                                temp.getFileName(),
-                                temp.getContentType(),
-                                temp.getFileSize());
+                        MusicTrack inserted = dao.insertBinary(temp);
                         ServerResponse<MusicTrack> resp =
-                                ServerResponse.ok("Binary track uploaded", newTrack);
+                                ServerResponse.ok("Binary track uploaded", inserted);
                         responseJson = MusicTrackJsonUtil.toJson(resp);
                     } catch (Exception e) {
                         responseJson = MusicTrackJsonUtil.toJson(

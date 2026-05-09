@@ -12,9 +12,9 @@ public interface MusicTrackDao { //defines interface, defines methods
 
     boolean deleteById(int songId);
 
-    MusicTrack updateTrack(int songId, String newTitle, int newBPM, double newDuration) throws Exception;
+    MusicTrack updateMusicTrack(int songId, MusicTrack entity) throws Exception;
 
-    int insert(String songTitle, int BPM, double durationInSeconds) throws Exception; // adding new track to database
+    MusicTrack insert(MusicTrack track) throws Exception; // adding new track to database
 
     List<MusicTrack> getAll() throws Exception;
 
@@ -24,7 +24,7 @@ public interface MusicTrackDao { //defines interface, defines methods
     List<MusicTrack> findByFilter(Predicate<MusicTrack> filter) throws Exception;
 
     // Binary file operations
-    int insertBinary(String songTitle, int BPM, double durationInSeconds, byte[] audioFile, String fileName, String contentType, int fileSize) throws Exception;
+    MusicTrack insertBinary(MusicTrack track) throws Exception;
 
     Optional<MusicTrack> getMusicTrackWithBinaryById(int songId) throws Exception;
 

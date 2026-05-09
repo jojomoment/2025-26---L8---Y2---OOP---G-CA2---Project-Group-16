@@ -39,8 +39,12 @@ class Stage4ExtendedTest {
 
     @Test
     void getAll_getById_insert_update_delete_filter_endToEnd() throws Exception {
-        int id1 = dao.insert("S4-Track-1", 120, 180.0);
-        int id2 = dao.insert("S4-Track-2", 130, 200.5);
+        MusicTrack track1 = new MusicTrack(0, "S4-Track-1", 120, 180.0);
+        MusicTrack inserted1 = dao.insert(track1);
+        int id1 = inserted1.getSongId();
+        MusicTrack track2 = new MusicTrack(0, "S4-Track-2", 130, 200.5);
+        MusicTrack inserted2 = dao.insert(track2);
+        int id2 = inserted2.getSongId();
         createdId = id1;
 
         try {
@@ -53,7 +57,8 @@ class Stage4ExtendedTest {
             assertTrue(by1.isPresent());
             assertEquals("S4-Track-1", by1.get().getSongTitle());
 
-            MusicTrack updated = dao.updateTrack(id1, "S4-Track-1-Updated", 140, 190.25);
+            MusicTrack updateEntity = new MusicTrack(id1, "S4-Track-1-Updated", 140, 190.25);
+            MusicTrack updated = dao.updateMusicTrack(id1, updateEntity);
             assertNotNull(updated);
             assertEquals(id1, updated.getSongId());
             assertEquals("S4-Track-1-Updated", updated.getSongTitle());
@@ -136,14 +141,9 @@ class Stage4ExtendedTest {
     @Test
     void server_getMetadata_returnsMetadataOnly_withoutBlob() throws Exception {
         byte[] originalBytes = new byte[]{5, 6, 7, 8};
-        int id = dao.insertBinary(
-                "Metadata Server Test",
-                111,
-                77.7,
-                originalBytes,
-                "meta-retrieve.wav",
-                "audio/wav",
-                originalBytes.length);
+        MusicTrack track = new MusicTrack(0, "Metadata Server Test", 111, 77.7, originalBytes, "meta-retrieve.wav", "audio/wav", originalBytes.length);
+        MusicTrack inserted = dao.insertBinary(track);
+        int id = inserted.getSongId();
         createdId = id;
 
         try (java.net.ServerSocket serverSocket = new java.net.ServerSocket(0)) {
@@ -282,7 +282,8 @@ class Stage4ExtendedTest {
         assertEquals("L2", copy.get(1).getSongTitle());
 
         // Also ensure DAO accepts those core fields.
-        int id1 = dao.insert(copy.get(0).getSongTitle(), copy.get(0).getBpm(), copy.get(0).getDurationInSeconds());
+        MusicTrack inserted = dao.insert(copy.get(0));
+        int id1 = inserted.getSongId();
         createdId = id1;
         MusicTrack stored = dao.getMusicTrackById(id1).orElseThrow();
         assertEquals("L1", stored.getSongTitle());
