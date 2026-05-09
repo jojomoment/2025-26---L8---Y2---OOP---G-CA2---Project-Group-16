@@ -140,18 +140,9 @@ mvn exec:java -Dexec.mainClass="musichub.client.TestClient"
 
 ## 3.2 Architecture Diagram
 
-```mermaid
-graph TD
-    A[Client Application] --> B[Socket Connection]
-    B --> C[Server]
-    C --> D[ExecutorService]
-    D --> E[ClientHandler]
-    E --> F[DAO Layer]
-    F --> G[(MySQL Database)]
+![alt text](image-1.png)
 
-    A --> H[JSON Requests]
-    C --> I[ServerResponse T]
-```
+
 
 ---
 

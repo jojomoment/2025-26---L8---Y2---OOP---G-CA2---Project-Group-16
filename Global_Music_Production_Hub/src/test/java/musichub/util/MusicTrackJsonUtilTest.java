@@ -149,4 +149,56 @@ class MusicTrackJsonUtilTest {
         assertTrue(deserialized.isSuccess());
         assertNull(deserialized.getData());
     }
+
+    @Test
+    void fromJson_throwsException_forInvalidJson() {
+        String invalidJson = "{invalid}";
+        assertThrows(Exception.class, () -> MusicTrackJsonUtil.fromJson(invalidJson, MusicTrack.class));
+    }
+
+    @Test
+    void listFromJson_throwsException_forInvalidJson() {
+        String invalidJson = "[invalid]";
+        assertThrows(Exception.class, () -> MusicTrackJsonUtil.listFromJson(invalidJson, MusicTrack.class));
+    }
+
+    @Test
+    void fromJson_handlesServerResponseWithPrimitiveData() {
+        ServerResponse<Integer> response = ServerResponse.ok("Success", 42);
+        String json = MusicTrackJsonUtil.toJson(response);
+        
+        ServerResponse<?> deserialized = MusicTrackJsonUtil.fromJson(json, ServerResponse.class);
+        
+        assertNotNull(deserialized);
+        assertTrue(deserialized.isSuccess());
+        assertEquals(42, deserialized.getData());
+    }
+
+    @Test
+    void fromJson_handlesServerResponseWithStringData() {
+        ServerResponse<String> response = ServerResponse.ok("Success", "test string");
+        String json = MusicTrackJsonUtil.toJson(response);
+        
+        ServerResponse<?> deserialized = MusicTrackJsonUtil.fromJson(json, ServerResponse.class);
+        
+        assertNotNull(deserialized);
+        assertTrue(deserialized.isSuccess());
+        assertEquals("test string", deserialized.getData());
+    }
+
+    @Test
+    void parseServerResponse_handlesMusicTrackWithFSongId() {
+        // Manually create JSON with fSongId to test the alternative branch
+        String json = "{\"success\":true,\"message\":\"Success\",\"data\":{\"fSongId\":1,\"fSongTitle\":\"Test\",\"fBpm\":120,\"fDurationInSeconds\":180.0}}";
+        
+        ServerResponse<?> response = MusicTrackJsonUtil.fromJson(json, ServerResponse.class);
+        
+        assertNotNull(response);
+        assertTrue(response.isSuccess());
+        assertNotNull(response.getData());
+        assertTrue(response.getData() instanceof MusicTrack);
+        MusicTrack track = (MusicTrack) response.getData();
+        assertEquals(1, track.getSongId());
+        assertEquals("Test", track.getSongTitle());
+    }
 }

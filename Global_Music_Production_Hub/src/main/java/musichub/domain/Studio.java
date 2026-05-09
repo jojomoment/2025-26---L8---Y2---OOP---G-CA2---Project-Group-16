@@ -98,10 +98,10 @@ public class Studio
     // Sets: hourly rate
     public void setHourlyRate(double hourlyRate)
     {
-        if (hourlyRate < 0)
+        if (hourlyRate <= 0)
         {
             throw new IllegalArgumentException(
-                    "Hourly rate cannot be negative");
+                    "Hourly rate must be positive");
         }
 
         this.fHourlyRate = hourlyRate;

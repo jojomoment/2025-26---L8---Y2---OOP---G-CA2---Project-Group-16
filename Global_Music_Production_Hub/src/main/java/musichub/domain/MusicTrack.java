@@ -236,18 +236,7 @@ public class MusicTrack
     @Override
     public int hashCode()
     {
-        int result = Objects.hash(
-                fSongId,
-                fSongTitle,
-                fBpm,
-                fDurationInSeconds,
-                fFileName,
-                fContentType,
-                fFileSize);
-
-        result = 31 * result + Arrays.hashCode(fAudioFile);
-
-        return result;
+        return Objects.hash(fSongId);
     }
 
     @Override

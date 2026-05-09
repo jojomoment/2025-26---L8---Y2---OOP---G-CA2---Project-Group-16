@@ -60,7 +60,7 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     public MusicTrack insert(MusicTrack track) throws SQLException {
 
         if (track.getSongTitle() == null || track.getSongTitle().isBlank())
-            throw new IllegalArgumentException("song_title is required");
+            throw new SQLException("song_title is required");
 
         String sql = "INSERT INTO music_tracks(songTitle, BPM, durationInSeconds) VALUES (?, ?, ?)";
 
@@ -156,52 +156,60 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     }
 
     private static MusicTrack mapRow(ResultSet rs, String[] columns) throws SQLException {
-        int id = rs.getInt("song_id");
-        String title = rs.getString("song_title");
-        int bpm = rs.getInt("bpm");
-        double duration = rs.getDouble("duration_in_seconds");
-
-        byte[] audioFile;
         try {
-            audioFile = rs.getBytes(columns[0]);
-        } catch (SQLException e) {
-            audioFile = null;
+            int id = rs.getInt("song_id");
+            String title = rs.getString("song_title");
+            int bpm = rs.getInt("bpm");
+            double duration = rs.getDouble("duration_in_seconds");
+
+            byte[] audioFile;
+            try {
+                audioFile = rs.getBytes(columns[0]);
+            } catch (SQLException e) {
+                audioFile = null;
+            }
+
+            String fileName = rs.getString(columns[1]);
+            if (fileName == null) {
+                fileName = "";
+            }
+
+            String contentType = rs.getString(columns[2]);
+            if (contentType == null) {
+                contentType = "";
+            }
+
+            int fileSize = rs.getInt(columns[3]);
+
+            return new MusicTrack(id, title, bpm, duration, audioFile, fileName, contentType, fileSize);
+        } catch (IllegalArgumentException e) {
+            throw new SQLException("Invalid data in database", e);
         }
-
-        String fileName = rs.getString(columns[1]);
-        if (fileName == null) {
-            fileName = "";
-        }
-
-        String contentType = rs.getString(columns[2]);
-        if (contentType == null) {
-            contentType = "";
-        }
-
-        int fileSize = rs.getInt(columns[3]);
-
-        return new MusicTrack(id, title, bpm, duration, audioFile, fileName, contentType, fileSize);
     }
 
     private static MusicTrack mapMetadataRow(ResultSet rs, String[] columns) throws SQLException {
-        int id = rs.getInt("song_id");
-        String title = rs.getString("song_title");
-        int bpm = rs.getInt("bpm");
-        double duration = rs.getDouble("duration_in_seconds");
+        try {
+            int id = rs.getInt("song_id");
+            String title = rs.getString("song_title");
+            int bpm = rs.getInt("bpm");
+            double duration = rs.getDouble("duration_in_seconds");
 
-        String fileName = rs.getString(columns[1]);
-        if (fileName == null) {
-            fileName = "";
+            String fileName = rs.getString(columns[1]);
+            if (fileName == null) {
+                fileName = "";
+            }
+
+            String contentType = rs.getString(columns[2]);
+            if (contentType == null) {
+                contentType = "";
+            }
+
+            int fileSize = rs.getInt(columns[3]);
+
+            return new MusicTrack(id, title, bpm, duration, null, fileName, contentType, fileSize);
+        } catch (IllegalArgumentException e) {
+            throw new SQLException("Invalid data in database", e);
         }
-
-        String contentType = rs.getString(columns[2]);
-        if (contentType == null) {
-            contentType = "";
-        }
-
-        int fileSize = rs.getInt(columns[3]);
-
-        return new MusicTrack(id, title, bpm, duration, null, fileName, contentType, fileSize);
     }
 
     private static boolean isUnknownColumnError(SQLException e) {
@@ -211,7 +219,7 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     @Override
     public MusicTrack insertBinary(MusicTrack track) throws SQLException {
         if (track.getSongTitle() == null || track.getSongTitle().isBlank())
-            throw new IllegalArgumentException("song_title is required");
+            throw new SQLException("song_title is required");
 
         try {
             int id = insertBinaryWithColumns(track.getSongTitle(), track.getBpm(), track.getDurationInSeconds(), track.getAudioFile(), track.getFileName(), track.getContentType(), track.getFileSize(), NEW_BINARY_COLUMNS);

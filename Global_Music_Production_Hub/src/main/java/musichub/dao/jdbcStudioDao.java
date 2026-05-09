@@ -153,12 +153,16 @@ public class jdbcStudioDao implements StudioDao
         }
     }
 
-    private static Studio mapRow(ResultSet rs) throws Exception
+    private static Studio mapRow(ResultSet rs) throws SQLException
     {
-        int studio_id = rs.getInt("studio_id");
-        String location_name = rs.getString("location_name");
-        int room_capacity = rs.getInt("room_capacity");
-        double hourly_rate = rs.getDouble("hourly_rate");
-        return new Studio(studio_id, location_name, room_capacity, hourly_rate);
+        try {
+            int studio_id = rs.getInt("studio_id");
+            String location_name = rs.getString("location_name");
+            int room_capacity = rs.getInt("room_capacity");
+            double hourly_rate = rs.getDouble("hourly_rate");
+            return new Studio(studio_id, location_name, room_capacity, hourly_rate);
+        } catch (IllegalArgumentException e) {
+            throw new SQLException("Invalid data in database", e);
+        }
     }
 }

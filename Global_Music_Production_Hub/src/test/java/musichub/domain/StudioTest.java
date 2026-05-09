@@ -18,7 +18,7 @@ class StudioTest {
 
     @Test
     void setters_updateFields() {
-        Studio studio = new Studio(0, "", 0, 0.0);
+        Studio studio = new Studio(1, "Initial Studio", 5, 25.0);
         
         studio.setStudioId(5);
         studio.setLocationName("Updated Studio");

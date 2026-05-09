@@ -38,11 +38,29 @@ class Stage3CoreTest {
         createdId = -1;
     }
 
-    @AfterEach
-    void tearDown() throws Exception {
-        if (createdId > 0) {
-            dao.deleteById(createdId);
-        }
+    @Test
+    void insert_throwsException_whenSongTitleIsBlank() throws Exception {
+        MusicTrack invalidTrack = new MusicTrack(0, "", 120, 180.0);
+        assertThrows(SQLException.class, () -> dao.insert(invalidTrack));
+    }
+
+    @Test
+    void insertBinary_throwsException_whenSongTitleIsBlank() throws Exception {
+        byte[] bytes = new byte[]{1, 2, 3};
+        MusicTrack invalidTrack = new MusicTrack(0, "", 120, 180.0, bytes, "file.wav", "audio/wav", bytes.length);
+        assertThrows(SQLException.class, () -> dao.insertBinary(invalidTrack));
+    }
+
+    @Test
+    void getMusicTrackById_returnsEmptyOptional_whenIdIsZero() throws Exception {
+        Optional<MusicTrack> result = dao.getMusicTrackById(0);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getMusicTrackById_returnsEmptyOptional_whenIdIsNegative() throws Exception {
+        Optional<MusicTrack> result = dao.getMusicTrackById(-1);
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -229,6 +247,323 @@ class Stage3CoreTest {
         assertEquals("meta.wav", metaTrack.getFileName());
         assertEquals("audio/wav", metaTrack.getContentType());
         assertEquals(bytes.length, track.getFileSize());
+    }
+
+    @Test
+    void server_insert_returnsServerResponse_okWrappedJson() throws Exception {
+        try (ServerSocket serverSocket = new ServerSocket(0)) {
+            int port = serverSocket.getLocalPort();
+
+            ExecutorService exec = Executors.newSingleThreadExecutor();
+            Future<?> serverFuture = exec.submit(() -> {
+                try (Socket s = serverSocket.accept()) {
+                    new ClientHandler(s, dao).run();
+                } catch (Exception ignored) {
+                }
+            });
+
+            try (Socket client = new Socket("localhost", port);
+                 PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()))) {
+
+                MusicTrack track = new MusicTrack(0, "Server Insert Test", 120, 180.0);
+                String json = MusicTrackJsonUtil.toJson(track);
+                out.println("INSERT:" + json);
+                String responseJson = in.readLine();
+                assertNotNull(responseJson);
+
+                ServerResponse<?> resp = MusicTrackJsonUtil.fromJson(responseJson, ServerResponse.class);
+                assertNotNull(resp);
+                assertTrue(resp.isSuccess());
+                assertNotNull(resp.getData());
+            }
+
+            // end handler loop cleanly
+            try (Socket client2 = new Socket("localhost", port)) {
+                // connect then close
+            }
+
+            serverFuture.get();
+            exec.shutdownNow();
+        }
+    }
+
+    @Test
+    void server_getById_returnsServerResponse_okWrappedJson() throws Exception {
+        // First insert a track
+        MusicTrack track = new MusicTrack(0, "Server GetById Test", 110, 200.0);
+        MusicTrack inserted = dao.insert(track);
+        int id = inserted.getSongId();
+        createdId = id;
+
+        try (ServerSocket serverSocket = new ServerSocket(0)) {
+            int port = serverSocket.getLocalPort();
+
+            ExecutorService exec = Executors.newSingleThreadExecutor();
+            Future<?> serverFuture = exec.submit(() -> {
+                try (Socket s = serverSocket.accept()) {
+                    new ClientHandler(s, dao).run();
+                } catch (Exception ignored) {
+                }
+            });
+
+            try (Socket client = new Socket("localhost", port);
+                 PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()))) {
+
+                out.println("GET_BY_ID:" + id);
+                String responseJson = in.readLine();
+                assertNotNull(responseJson);
+
+                ServerResponse<?> resp = MusicTrackJsonUtil.fromJson(responseJson, ServerResponse.class);
+                assertNotNull(resp);
+                assertTrue(resp.isSuccess());
+                assertNotNull(resp.getData());
+            }
+
+            // end handler loop cleanly
+            try (Socket client2 = new Socket("localhost", port)) {
+                // connect then close
+            }
+
+            serverFuture.get();
+            exec.shutdownNow();
+        }
+    }
+
+    @Test
+    void server_update_returnsServerResponse_okWrappedJson() throws Exception {
+        // First insert a track
+        MusicTrack track = new MusicTrack(0, "Server Update Test", 130, 150.0);
+        MusicTrack inserted = dao.insert(track);
+        int id = inserted.getSongId();
+        createdId = id;
+
+        try (ServerSocket serverSocket = new ServerSocket(0)) {
+            int port = serverSocket.getLocalPort();
+
+            ExecutorService exec = Executors.newSingleThreadExecutor();
+            Future<?> serverFuture = exec.submit(() -> {
+                try (Socket s = serverSocket.accept()) {
+                    new ClientHandler(s, dao).run();
+                } catch (Exception ignored) {
+                }
+            });
+
+            try (Socket client = new Socket("localhost", port);
+                 PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()))) {
+
+                MusicTrack updatedTrack = new MusicTrack(id, "Updated Title", 140, 160.0);
+                String json = MusicTrackJsonUtil.toJson(updatedTrack);
+                out.println("UPDATE:" + json);
+                String responseJson = in.readLine();
+                assertNotNull(responseJson);
+
+                ServerResponse<?> resp = MusicTrackJsonUtil.fromJson(responseJson, ServerResponse.class);
+                assertNotNull(resp);
+                assertTrue(resp.isSuccess());
+                assertNotNull(resp.getData());
+            }
+
+            // end handler loop cleanly
+            try (Socket client2 = new Socket("localhost", port)) {
+                // connect then close
+            }
+
+            serverFuture.get();
+            exec.shutdownNow();
+        }
+    }
+
+    @Test
+    void server_delete_returnsServerResponse_okWrappedJson() throws Exception {
+        // First insert a track
+        MusicTrack track = new MusicTrack(0, "Server Delete Test", 150, 170.0);
+        MusicTrack inserted = dao.insert(track);
+        int id = inserted.getSongId();
+        // Don't set createdId since we're deleting it
+
+        try (ServerSocket serverSocket = new ServerSocket(0)) {
+            int port = serverSocket.getLocalPort();
+
+            ExecutorService exec = Executors.newSingleThreadExecutor();
+            Future<?> serverFuture = exec.submit(() -> {
+                try (Socket s = serverSocket.accept()) {
+                    new ClientHandler(s, dao).run();
+                } catch (Exception ignored) {
+                }
+            });
+
+            try (Socket client = new Socket("localhost", port);
+                 PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()))) {
+
+                out.println("DELETE:" + id);
+                String responseJson = in.readLine();
+                assertNotNull(responseJson);
+
+                ServerResponse<?> resp = MusicTrackJsonUtil.fromJson(responseJson, ServerResponse.class);
+                assertNotNull(resp);
+                assertTrue(resp.isSuccess());
+            }
+
+            // end handler loop cleanly
+            try (Socket client2 = new Socket("localhost", port)) {
+                // connect then close
+            }
+
+            serverFuture.get();
+            exec.shutdownNow();
+        }
+    }
+
+    @Test
+    void server_invalidRequest_returnsErrorResponse() throws Exception {
+        try (ServerSocket serverSocket = new ServerSocket(0)) {
+            int port = serverSocket.getLocalPort();
+
+            ExecutorService exec = Executors.newSingleThreadExecutor();
+            Future<?> serverFuture = exec.submit(() -> {
+                try (Socket s = serverSocket.accept()) {
+                    new ClientHandler(s, dao).run();
+                } catch (Exception ignored) {
+                }
+            });
+
+            try (Socket client = new Socket("localhost", port);
+                 PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()))) {
+
+                out.println("INVALID_REQUEST");
+                String responseJson = in.readLine();
+                assertNotNull(responseJson);
+
+                ServerResponse<?> resp = MusicTrackJsonUtil.fromJson(responseJson, ServerResponse.class);
+                assertNotNull(resp);
+                assertFalse(resp.isSuccess());
+                assertNotNull(resp.getMessage());
+            }
+
+            // end handler loop cleanly
+            try (Socket client2 = new Socket("localhost", port)) {
+                // connect then close
+            }
+
+            serverFuture.get();
+            exec.shutdownNow();
+        }
+    }
+
+    @Test
+    void server_insertInvalidJson_returnsErrorResponse() throws Exception {
+        try (ServerSocket serverSocket = new ServerSocket(0)) {
+            int port = serverSocket.getLocalPort();
+
+            ExecutorService exec = Executors.newSingleThreadExecutor();
+            Future<?> serverFuture = exec.submit(() -> {
+                try (Socket s = serverSocket.accept()) {
+                    new ClientHandler(s, dao).run();
+                } catch (Exception ignored) {
+                }
+            });
+
+            try (Socket client = new Socket("localhost", port);
+                 PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()))) {
+
+                out.println("INSERT:{invalid json}");
+                String responseJson = in.readLine();
+                assertNotNull(responseJson);
+
+                ServerResponse<?> resp = MusicTrackJsonUtil.fromJson(responseJson, ServerResponse.class);
+                assertNotNull(resp);
+                assertFalse(resp.isSuccess());
+                assertNotNull(resp.getMessage());
+            }
+
+            // end handler loop cleanly
+            try (Socket client2 = new Socket("localhost", port)) {
+                // connect then close
+            }
+
+            serverFuture.get();
+            exec.shutdownNow();
+        }
+    }
+
+    @Test
+    void server_getByIdInvalid_returnsErrorResponse() throws Exception {
+        try (ServerSocket serverSocket = new ServerSocket(0)) {
+            int port = serverSocket.getLocalPort();
+
+            ExecutorService exec = Executors.newSingleThreadExecutor();
+            Future<?> serverFuture = exec.submit(() -> {
+                try (Socket s = serverSocket.accept()) {
+                    new ClientHandler(s, dao).run();
+                } catch (Exception ignored) {
+                }
+            });
+
+            try (Socket client = new Socket("localhost", port);
+                 PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()))) {
+
+                out.println("GET_BY_ID:abc");
+                String responseJson = in.readLine();
+                assertNotNull(responseJson);
+
+                ServerResponse<?> resp = MusicTrackJsonUtil.fromJson(responseJson, ServerResponse.class);
+                assertNotNull(resp);
+                assertFalse(resp.isSuccess());
+                assertNotNull(resp.getMessage());
+            }
+
+            // end handler loop cleanly
+            try (Socket client2 = new Socket("localhost", port)) {
+                // connect then close
+            }
+
+            serverFuture.get();
+            exec.shutdownNow();
+        }
+    }
+
+    @Test
+    void server_deleteInvalid_returnsErrorResponse() throws Exception {
+        try (ServerSocket serverSocket = new ServerSocket(0)) {
+            int port = serverSocket.getLocalPort();
+
+            ExecutorService exec = Executors.newSingleThreadExecutor();
+            Future<?> serverFuture = exec.submit(() -> {
+                try (Socket s = serverSocket.accept()) {
+                    new ClientHandler(s, dao).run();
+                } catch (Exception ignored) {
+                }
+            });
+
+            try (Socket client = new Socket("localhost", port);
+                 PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()))) {
+
+                out.println("DELETE:xyz");
+                String responseJson = in.readLine();
+                assertNotNull(responseJson);
+
+                ServerResponse<?> resp = MusicTrackJsonUtil.fromJson(responseJson, ServerResponse.class);
+                assertNotNull(resp);
+                assertFalse(resp.isSuccess());
+                assertNotNull(resp.getMessage());
+            }
+
+            // end handler loop cleanly
+            try (Socket client2 = new Socket("localhost", port)) {
+                // connect then close
+            }
+
+            serverFuture.get();
+            exec.shutdownNow();
+        }
     }
 }
 
