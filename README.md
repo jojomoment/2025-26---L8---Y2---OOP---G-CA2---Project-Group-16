@@ -219,6 +219,21 @@ mvn test
 ---
 
 ## 6.2 Test Categories
+<<<<<<< HEAD
+=======
+
+* DAO tests
+* JSON serialization tests
+* ClientHandler/server tests
+* Binary upload/retrieval tests
+* Integration tests
+
+---
+
+## 6.3 Coverage Evidence
+
+Coverage was generated using the IntelliJ IDEA and Vscode coverage runner and stored in:
+>>>>>>> 623300e27c537808539d8bfc0d85af1d32fc5081
 
 * DAO tests
 * JSON serialization tests
@@ -303,7 +318,11 @@ Coverage includes:
 
 | Task                                  | Primary Author | Contributor    |
 | ------------------------------------- | -------------- | -------------- |
+<<<<<<< HEAD
 | Database schema and setup             | | Kamil Seidou   |Daniel Vincent 
+=======
+| Database schema and setup             | Kamil Seidou   |Daniel Vincent  |
+>>>>>>> 623300e27c537808539d8bfc0d85af1d32fc5081
 | DAO layer implementation              | Kamil Seidou   | Daniel Vincent |
 | JSON utilities and Gson configuration | Daniel Vincent | Kamil Seidou   |
 | Client-server communication           | Daniel Vinent   | Kamil Seidou  |
