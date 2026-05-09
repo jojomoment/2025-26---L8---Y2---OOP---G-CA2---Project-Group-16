@@ -300,7 +300,7 @@ Coverage includes:
 
 | Task                                  | Primary Author | Contributor    |
 | ------------------------------------- | -------------- | -------------- |
-| Database schema and setup             | |Kamil Seidou   |Daniel Vincent 
+| Database schema and setup             | Kamil Seidou   |Daniel Vincent  |
 | DAO layer implementation              | Kamil Seidou   | Daniel Vincent |
 | JSON utilities and Gson configuration | Daniel Vincent | Kamil Seidou   |
 | Client-server communication           | Daniel Vinent   | Kamil Seidou  |
