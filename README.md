@@ -23,7 +23,7 @@ The application uses a client-server architecture with JSON-based communication 
 ### Members
 
 * **Daniel Vincent** — `D00280851`
-* **Kamil Seidou**
+* **Kamil Seidou** -  `D00281578`
 
 ---
 
