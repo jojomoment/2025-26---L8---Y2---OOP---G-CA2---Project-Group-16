@@ -18,14 +18,10 @@ public class jdbcStudioDao implements StudioDao
 
 
     @Override
-    public int insert(int studio_id, String location_name, int room_capacity, double hourly_rate) throws SQLException
+    public int insert(String location_name, int room_capacity, double hourly_rate) throws SQLException
     {
 
         //making sure invalid data isnt entered
-        if (studio_id <=0)
-            throw new IllegalArgumentException("studio id required");
-
-
         if (location_name == null || location_name.isBlank())
             throw new IllegalArgumentException("location name required");
 
@@ -37,7 +33,7 @@ public class jdbcStudioDao implements StudioDao
 
 
         //adding row to music tracks table with specified parameters and placeholders
-        String sql = "INSERT INTO studio(studio_id, location_name, room_capacity,hourly_rate) VALUES (?, ?, ?,?)"; // sql query in a java string
+        String sql = "INSERT INTO studios(location_name, room_capacity, hourly_rate) VALUES (?, ?, ?)"; // sql query in a java string
 
 
         // closes when finished
@@ -48,10 +44,9 @@ public class jdbcStudioDao implements StudioDao
 
             // populate ? placeholders
             // numbers ref positon
-            ps.setInt(1, studio_id);
-            ps.setString(2, location_name);
-            ps.setInt(3, room_capacity);
-            ps.setDouble(4, hourly_rate);
+            ps.setString(1, location_name);
+            ps.setInt(2, room_capacity);
+            ps.setDouble(3, hourly_rate);
 
 
             // excutes and checks if a row was affected or not
@@ -76,7 +71,7 @@ public class jdbcStudioDao implements StudioDao
     @Override
     public List<Studio> getAll() throws SQLException
     {
-        String sql = "SELECT studio_id, location_name, room_capacity,hourly_rate FROM studio WHERE studio_id ";//sql query in string java code
+        String sql = "SELECT studio_id, location_name, room_capacity, hourly_rate FROM studios";
 
         // closes when code finishes
         try (Connection c = DatabaseConnection.getConnection();
@@ -96,7 +91,66 @@ public class jdbcStudioDao implements StudioDao
     @Override
     public Optional<Studio> getStudioById(int studio_id) throws SQLException
     {
-        return Optional.empty();
+        if (studio_id <= 0)
+            return Optional.empty();
+
+        String sql = "SELECT studio_id, location_name, room_capacity, hourly_rate FROM studios WHERE studio_id = ?";
+
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql))
+        {
+
+            ps.setInt(1, studio_id);
+
+            try (ResultSet rs = ps.executeQuery())
+            {
+
+                if (!rs.next())
+                    return Optional.empty();
+
+                return Optional.of(mapRow(rs));
+            }
+        }
+    }
+
+    @Override
+    public boolean deleteById(int studio_id) throws SQLException
+    {
+        String sql = "DELETE FROM studios WHERE studio_id = ?";
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement statement = c.prepareStatement(sql)) {
+
+            statement.setInt(1, studio_id);
+            int rowsDeleted = statement.executeUpdate();
+            return rowsDeleted > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public Studio updateStudio(int studio_id, String location_name, int room_capacity, double hourly_rate) throws SQLException
+    {
+        String sql = "UPDATE studios SET location_name = ?, room_capacity = ?, hourly_rate = ? WHERE studio_id = ?";
+
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setString(1, location_name);
+            ps.setInt(2, room_capacity);
+            ps.setDouble(3, hourly_rate);
+            ps.setInt(4, studio_id);
+
+            int rowsUpdated = ps.executeUpdate();
+
+            if (rowsUpdated > 0) {
+                return getStudioById(studio_id).orElse(null);
+            } else {
+                return null;
+            }
+        }
     }
 
     private static Studio mapRow(ResultSet rs) throws Exception

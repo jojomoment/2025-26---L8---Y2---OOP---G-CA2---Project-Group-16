@@ -22,4 +22,11 @@ public interface MusicTrackDao { //defines interface, defines methods
 
 
     List<MusicTrack> findByFilter(Predicate<MusicTrack> filter) throws Exception;
+
+    // Binary file operations
+    int insertBinary(String songTitle, int BPM, double durationInSeconds, byte[] audioFile, String fileName, String contentType, int fileSize) throws Exception;
+
+    Optional<MusicTrack> getMusicTrackWithBinaryById(int songId) throws Exception;
+
+    Optional<MusicTrack> getMusicTrackMetadataById(int songId) throws Exception;
 }

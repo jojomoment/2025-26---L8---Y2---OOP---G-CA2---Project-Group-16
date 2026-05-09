@@ -87,7 +87,7 @@ public class ClientHandler implements Runnable
                         MusicTrack updated = dao.updateTrack(
                                 track.getSongId(),
                                 track.getSongTitle(),
-                                track.getBPM(),
+                                track.getBpm(),
                                 track.getDurationInSeconds()
                         );
                         if (updated != null) {
@@ -133,12 +133,12 @@ public class ClientHandler implements Runnable
                         MusicTrack temp = MusicTrackJsonUtil.fromJson(json, MusicTrack.class);
                         int newId = dao.insert(
                                 temp.getSongTitle(),
-                                temp.getBPM(),
+                                temp.getBpm(),
                                 temp.getDurationInSeconds()
                         );
                         MusicTrack newTrack = new MusicTrack(newId,
                                 temp.getSongTitle(),
-                                temp.getBPM(),
+                                temp.getBpm(),
                                 temp.getDurationInSeconds());
                         ServerResponse<MusicTrack> resp =
                                 ServerResponse.ok("Track created", newTrack);
@@ -147,6 +147,85 @@ public class ClientHandler implements Runnable
                         responseJson = MusicTrackJsonUtil.toJson(
                                 ServerResponse.error("Invalid insert request"));
                     }
+                }
+                // Binary upload
+                else if (request.startsWith("UPLOAD_BINARY:")) 
+                    {
+                    try {
+                        String json = request.substring(14);
+                        MusicTrack temp = MusicTrackJsonUtil.fromJson(json, MusicTrack.class);
+                        int newId = dao.insertBinary(
+                                temp.getSongTitle(),
+                                temp.getBpm(),
+                                temp.getDurationInSeconds(),
+                                temp.getAudioFile(),
+                                temp.getFileName(),
+                                temp.getContentType(),
+                                temp.getFileSize()
+                        );
+                        MusicTrack newTrack = new MusicTrack(newId,
+                                temp.getSongTitle(),
+                                temp.getBpm(),
+                                temp.getDurationInSeconds(),
+                                temp.getAudioFile(),
+                                temp.getFileName(),
+                                temp.getContentType(),
+                                temp.getFileSize());
+                        ServerResponse<MusicTrack> resp =
+                                ServerResponse.ok("Binary track uploaded", newTrack);
+                        responseJson = MusicTrackJsonUtil.toJson(resp);
+                    } catch (Exception e) {
+                        responseJson = MusicTrackJsonUtil.toJson(
+                                ServerResponse.error("Invalid binary upload request"));
+                    }
+                }
+                // Binary retrieve
+                else if (request.startsWith("RETRIEVE_BINARY:")) 
+                    {
+                    try {
+                        String[] parts = request.split(":");
+                        int id = Integer.parseInt(parts[1]);
+                        Optional<MusicTrack> opt = dao.getMusicTrackWithBinaryById(id);
+                        if (opt.isPresent()) {
+                            ServerResponse<MusicTrack> resp =
+                                    ServerResponse.ok("Binary track retrieved", opt.get());
+                            responseJson = MusicTrackJsonUtil.toJson(resp);
+                        } else {
+                            responseJson = MusicTrackJsonUtil.toJson(
+                                    ServerResponse.error("Binary track not found"));
+                        }
+                    } catch (Exception e) {
+                        responseJson = MusicTrackJsonUtil.toJson(
+                                ServerResponse.error("Invalid binary retrieve request"));
+                    }
+                }
+                // Get metadata
+                else if (request.startsWith("GET_METADATA:")) 
+                    {
+                    try {
+                        String[] parts = request.split(":");
+                        int id = Integer.parseInt(parts[1]);
+                        Optional<MusicTrack> opt = dao.getMusicTrackMetadataById(id);
+                        if (opt.isPresent()) {
+                            ServerResponse<MusicTrack> resp =
+                                    ServerResponse.ok("Metadata retrieved", opt.get());
+                            responseJson = MusicTrackJsonUtil.toJson(resp);
+                        } else {
+                            responseJson = MusicTrackJsonUtil.toJson(
+                                    ServerResponse.error("Track not found"));
+                        }
+                    } catch (Exception e) {
+                        responseJson = MusicTrackJsonUtil.toJson(
+                                ServerResponse.error("Invalid metadata request"));
+                    }
+                }
+                // disconnect
+                else if ("DISCONNECT".equalsIgnoreCase(request)) 
+                    {
+                    ServerResponse<Object> resp = ServerResponse.ok("Client disconnected", null);
+                    responseJson = MusicTrackJsonUtil.toJson(resp);
+                    out.println(responseJson);
+                    break;
                 }
                 // unknown
                 else 

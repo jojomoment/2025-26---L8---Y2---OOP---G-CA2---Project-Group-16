@@ -50,7 +50,7 @@ public class FakeMusicTrackDao implements MusicTrackDao {
         for (MusicTrack t : tracks) {
             if (t.getSongId() == songId) {
                 t.setSongTitle(newTitle);
-                t.setBPM(newBPM);
+                t.setBpm(newBPM);
                 t.setDurationInSeconds(newDuration);
                 return t;
             }
@@ -61,5 +61,34 @@ public class FakeMusicTrackDao implements MusicTrackDao {
     @Override
     public List<MusicTrack> findByFilter(Predicate<MusicTrack> filter) {
         return tracks.stream().filter(filter).toList();
+    }
+
+    @Override
+    public int insertBinary(String songTitle, int BPM, double durationInSeconds, byte[] audioFile, String fileName, String contentType, int fileSize) throws Exception {
+        int newId = tracks.size() + 1;
+        MusicTrack track = new MusicTrack(newId, songTitle, BPM, durationInSeconds, audioFile, fileName, contentType, fileSize);
+        tracks.add(track);
+        return newId;
+    }
+
+    @Override
+    public Optional<MusicTrack> getMusicTrackWithBinaryById(int songId) throws Exception {
+        return tracks.stream()
+                .filter(t -> t.getSongId() == songId)
+                .findFirst();
+    }
+
+    @Override
+    public Optional<MusicTrack> getMusicTrackMetadataById(int songId) throws Exception {
+        return tracks.stream()
+                .filter(t -> t.getSongId() == songId)
+                .map(t -> {
+                    MusicTrack meta = new MusicTrack(t.getSongId(), t.getSongTitle(), t.getBpm(), t.getDurationInSeconds());
+                    meta.setFileName(t.getFileName());
+                    meta.setContentType(t.getContentType());
+                    meta.setFileSize(t.getFileSize());
+                    return meta;
+                })
+                .findFirst();
     }
 }

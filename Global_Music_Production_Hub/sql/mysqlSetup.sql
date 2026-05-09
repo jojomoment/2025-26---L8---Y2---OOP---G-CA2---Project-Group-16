@@ -1,10 +1,11 @@
+-- mysqlSetup.sql
+-- Recreates the schema required for Stage 3 binary BLOB + metadata handling.
+
 -- Create database
 CREATE DATABASE IF NOT EXISTS musichub;
 USE musichub;
 
--- =========================
--- MUSIC TRACKS TABLE
--- =========================
+-- MUSIC TRACKS TABLE (Stage 3 binary extension)
 CREATE TABLE IF NOT EXISTS music_tracks
 (
     songId INT NOT NULL AUTO_INCREMENT,
@@ -12,21 +13,22 @@ CREATE TABLE IF NOT EXISTS music_tracks
     BPM INT NOT NULL,
     durationInSeconds DOUBLE NOT NULL,
     audio_file BLOB,
+
+    -- Metadata (required by F17)
     file_name VARCHAR(255),
     content_type VARCHAR(100),
     file_size INT,
-    PRIMARY KEY (songId)
-    );
 
--- Alter table to add binary columns if not exists
+    PRIMARY KEY (songId)
+);
+
+-- Ensure columns exist (idempotent)
 ALTER TABLE music_tracks ADD COLUMN IF NOT EXISTS audio_file BLOB;
 ALTER TABLE music_tracks ADD COLUMN IF NOT EXISTS file_name VARCHAR(255);
 ALTER TABLE music_tracks ADD COLUMN IF NOT EXISTS content_type VARCHAR(100);
 ALTER TABLE music_tracks ADD COLUMN IF NOT EXISTS file_size INT;
 
--- =========================
 -- STUDIOS TABLE
--- =========================
 CREATE TABLE IF NOT EXISTS studios
 (
     studio_id INT NOT NULL AUTO_INCREMENT,
@@ -34,24 +36,9 @@ CREATE TABLE IF NOT EXISTS studios
     room_capacity INT NOT NULL,
     hourly_rate DOUBLE NOT NULL,
     PRIMARY KEY (studio_id)
-    );
+);
 
--- Seed data for studios
-INSERT INTO studios (location_name, room_capacity, hourly_rate)
-VALUES
-    ('Dublin Central Studio', 10, 50.0),
-    ('Cork Sound Lab', 8, 40.0),
-    ('Galway Beats Studio', 12, 60.0),
-    ('Limerick Pro Audio', 6, 35.0),
-    ('Waterford Music Hub', 15, 70.0);
-
-
-
-
-
--- =========================
 -- MUSIC PRODUCERS TABLE
--- =========================
 CREATE TABLE IF NOT EXISTS music_producers
 (
     producer_id INT NOT NULL,
@@ -59,18 +46,5 @@ CREATE TABLE IF NOT EXISTS music_producers
     tracks_uploaded INT NOT NULL,
     average_rating DOUBLE NOT NULL,
     PRIMARY KEY (producer_id)
-    );
+);
 
-
-INSERT INTO music_producers (producer_id, stage_name, tracks_uploaded, average_rating)
-VALUES
-    (1, 'DJ Nova', 25, 4.5),
-    (2, 'BeatMasterX', 40, 4.8),
-    (3, 'EchoWave', 15, 4.2),
-    (4, 'SynthLord', 60, 4.9),
-    (5, 'BassHunter', 30, 4.3),
-    (6, 'RhythmRider', 22, 4.1),
-    (7, 'SoundCrafter', 18, 4.6),
-    (8, 'PulseMaker', 50, 4.7),
-    (9, 'VibeSmith', 27, 4.4),
-    (10, 'TrackWizard', 35, 4.85);

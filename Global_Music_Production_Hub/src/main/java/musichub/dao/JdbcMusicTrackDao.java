@@ -11,12 +11,15 @@ import java.util.function.Predicate;
 
 public class JdbcMusicTrackDao implements MusicTrackDao {
 
+    private static final String[] NEW_BINARY_COLUMNS = {"audio_file", "file_name", "content_type", "file_size"};
+    private static final String[] LEGACY_BINARY_COLUMNS = {"audioFile", "fileName", "contentType", "fileSize"};
+
     public JdbcMusicTrackDao() {
     }
 
     @Override
     public boolean deleteById(int song_id) {
-        String sql = "DELETE FROM music_tracks WHERE song_id = ?";
+        String sql = "DELETE FROM music_tracks WHERE songId = ?";
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement statement = c.prepareStatement(sql)) {
 
@@ -33,7 +36,7 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
     @Override
     public MusicTrack updateTrack(int song_id, String newTitle, int newBPM, double newDuration) throws SQLException {
 
-        String sql = "UPDATE music_tracks SET song_title = ?, bpm = ?, duration_in_seconds = ? WHERE song_id = ?";
+        String sql = "UPDATE music_tracks SET songTitle = ?, BPM = ?, durationInSeconds = ? WHERE songId = ?";
 
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -59,7 +62,7 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
         if (song_title == null || song_title.isBlank())
             throw new IllegalArgumentException("song_title is required");
 
-        String sql = "INSERT INTO music_tracks(song_title, bpm, duration_in_seconds) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO music_tracks(songTitle, BPM, durationInSeconds) VALUES (?, ?, ?)";
 
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -83,18 +86,13 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
 
     @Override
     public List<MusicTrack> getAll() throws SQLException {
-
-        String sql = "SELECT song_id, song_title, bpm, duration_in_seconds FROM music_tracks";
-
-        try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            List<MusicTrack> tracks = new ArrayList<>();
-            while (rs.next()) {
-                tracks.add(mapRow(rs));
+        try {
+            return selectAllWithColumns(NEW_BINARY_COLUMNS);
+        } catch (SQLException e) {
+            if (isUnknownColumnError(e)) {
+                return selectAllWithColumns(LEGACY_BINARY_COLUMNS);
             }
-            return tracks;
+            throw e;
         }
     }
 
@@ -104,20 +102,13 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
         if (song_id <= 0)
             return Optional.empty();
 
-        String sql = "SELECT song_id, song_title, bpm, duration_in_seconds FROM music_tracks WHERE song_id = ?";
-
-        try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-
-            ps.setInt(1, song_id);
-
-            try (ResultSet rs = ps.executeQuery()) {
-
-                if (!rs.next())
-                    return Optional.empty();
-
-                return Optional.of(mapRow(rs));
+        try {
+            return selectByIdWithColumns(NEW_BINARY_COLUMNS, song_id, false);
+        } catch (SQLException e) {
+            if (isUnknownColumnError(e)) {
+                return selectByIdWithColumns(LEGACY_BINARY_COLUMNS, song_id, false);
             }
+            throw e;
         }
     }
 
@@ -131,13 +122,159 @@ public class JdbcMusicTrackDao implements MusicTrackDao {
                 .toList();
     }
 
-    private static MusicTrack mapRow(ResultSet rs) throws SQLException {
+    private List<MusicTrack> selectAllWithColumns(String[] columns) throws SQLException {
+        String sql = String.format("SELECT songId as song_id, songTitle as song_title, BPM as bpm, durationInSeconds as duration_in_seconds, %s FROM music_tracks", String.join(", ", columns));
 
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            List<MusicTrack> tracks = new ArrayList<>();
+            while (rs.next()) {
+                tracks.add(mapRow(rs, columns));
+            }
+            return tracks;
+        }
+    }
+
+    private Optional<MusicTrack> selectByIdWithColumns(String[] columns, int songId, boolean metadataOnly) throws SQLException {
+        String sql = String.format("SELECT songId as song_id, songTitle as song_title, BPM as bpm, durationInSeconds as duration_in_seconds, %s FROM music_tracks WHERE songId = ?", String.join(", ", columns));
+
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setInt(1, songId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next())
+                    return Optional.empty();
+
+                return Optional.of(metadataOnly ? mapMetadataRow(rs, columns) : mapRow(rs, columns));
+            }
+        }
+    }
+
+    private static MusicTrack mapRow(ResultSet rs, String[] columns) throws SQLException {
         int id = rs.getInt("song_id");
         String title = rs.getString("song_title");
         int bpm = rs.getInt("bpm");
         double duration = rs.getDouble("duration_in_seconds");
 
-        return new MusicTrack(id, title, bpm, duration);
+        byte[] audioFile;
+        try {
+            audioFile = rs.getBytes(columns[0]);
+        } catch (SQLException e) {
+            audioFile = null;
+        }
+
+        String fileName = rs.getString(columns[1]);
+        if (fileName == null) {
+            fileName = "";
+        }
+
+        String contentType = rs.getString(columns[2]);
+        if (contentType == null) {
+            contentType = "";
+        }
+
+        int fileSize = rs.getInt(columns[3]);
+
+        return new MusicTrack(id, title, bpm, duration, audioFile, fileName, contentType, fileSize);
+    }
+
+    private static MusicTrack mapMetadataRow(ResultSet rs, String[] columns) throws SQLException {
+        int id = rs.getInt("song_id");
+        String title = rs.getString("song_title");
+        int bpm = rs.getInt("bpm");
+        double duration = rs.getDouble("duration_in_seconds");
+
+        String fileName = rs.getString(columns[1]);
+        if (fileName == null) {
+            fileName = "";
+        }
+
+        String contentType = rs.getString(columns[2]);
+        if (contentType == null) {
+            contentType = "";
+        }
+
+        int fileSize = rs.getInt(columns[3]);
+
+        return new MusicTrack(id, title, bpm, duration, null, fileName, contentType, fileSize);
+    }
+
+    private static boolean isUnknownColumnError(SQLException e) {
+        return e.getMessage().contains("Unknown column") || (e.getSQLState() != null && e.getSQLState().startsWith("42"));
+    }
+
+    @Override
+    public int insertBinary(String songTitle, int bpm, double durationInSeconds, byte[] audioFile, String fileName, String contentType, int fileSize) throws SQLException {
+        if (songTitle == null || songTitle.isBlank())
+            throw new IllegalArgumentException("song_title is required");
+
+        try {
+            return insertBinaryWithColumns(songTitle, bpm, durationInSeconds, audioFile, fileName, contentType, fileSize, NEW_BINARY_COLUMNS);
+        } catch (SQLException e) {
+            if (isUnknownColumnError(e)) {
+                return insertBinaryWithColumns(songTitle, bpm, durationInSeconds, audioFile, fileName, contentType, fileSize, LEGACY_BINARY_COLUMNS);
+            }
+            throw e;
+        }
+    }
+
+    private int insertBinaryWithColumns(String songTitle, int bpm, double durationInSeconds, byte[] audioFile, String fileName, String contentType, int fileSize, String[] columns) throws SQLException {
+        String sql = String.format("INSERT INTO music_tracks(songTitle, BPM, durationInSeconds, %s) VALUES (?, ?, ?, ?, ?, ?, ?)", String.join(", ", columns));
+
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, songTitle.trim());
+            ps.setInt(2, bpm);
+            ps.setDouble(3, durationInSeconds);
+            ps.setBytes(4, audioFile);
+            ps.setString(5, fileName);
+            ps.setString(6, contentType);
+            ps.setInt(7, fileSize);
+
+            int rows = ps.executeUpdate();
+            if (rows != 1)
+                throw new IllegalStateException("Insert failed, rows=" + rows);
+
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (!keys.next())
+                    throw new IllegalStateException("No generated key returned");
+
+                return keys.getInt(1);
+            }
+        }
+    }
+
+    @Override
+    public Optional<MusicTrack> getMusicTrackWithBinaryById(int songId) throws SQLException {
+        if (songId <= 0)
+            return Optional.empty();
+
+        try {
+            return selectByIdWithColumns(NEW_BINARY_COLUMNS, songId, false);
+        } catch (SQLException e) {
+            if (isUnknownColumnError(e)) {
+                return selectByIdWithColumns(LEGACY_BINARY_COLUMNS, songId, false);
+            }
+            throw e;
+        }
+    }
+
+    @Override
+    public Optional<MusicTrack> getMusicTrackMetadataById(int songId) throws SQLException {
+        if (songId <= 0)
+            return Optional.empty();
+
+        try {
+            return selectByIdWithColumns(NEW_BINARY_COLUMNS, songId, true);
+        } catch (SQLException e) {
+            if (isUnknownColumnError(e)) {
+                return selectByIdWithColumns(LEGACY_BINARY_COLUMNS, songId, true);
+            }
+            throw e;
+        }
     }
 }
